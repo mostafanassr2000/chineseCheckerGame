@@ -7,12 +7,11 @@ import java.awt.Point;
 import javax.swing.JPanel;
 
 
-@SuppressWarnings("serial")
-public class BackPanelGraph extends JPanel {
+public class BackJPanel extends JPanel {
 	private Point p;
 	private Image img;
 	
-	public BackPanelGraph(Image img , Point p){
+	public BackJPanel(Image img , Point p){
 		this.p = p;
 		this.img=img;
 	}

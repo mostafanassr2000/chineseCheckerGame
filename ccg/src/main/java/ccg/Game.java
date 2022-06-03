@@ -11,13 +11,15 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
-public final class ChineseCheckersGraph {
+public final class Game {
 
 	private JFrame frame;
 	private JButton easy, medium, hard;
+	private boolean run = false;
+
+
 	public static final int H = 21, W = 33;
-	public boolean run = false, aiSearch = false;
-	public static CellVertex[][] vertexMat = new CellVertex[H][W];
+	public static Vertex[][] vertexMat = new Vertex[H][W];
 
 	private final int[][] win = {
 			{ 0, 12 },
@@ -71,67 +73,57 @@ public final class ChineseCheckersGraph {
 	};
 	// private int coordIndex;
 
-	public ChineseCheckersGraph() {
-		// coordMat = new Point[579][];
-		// coordIndex = 0;
-
-		int counter = 0;
-
-		//System.out.println(logicMat.length);
-		//System.out.println(logicMat[0].length);
-
+	public Game() {
 		for (int i = 0; i < logicMat.length; i++) {
 			for (int j = 0; j < logicMat[i].length; j++) {
 				if (this.vertexMat[i][j] == null) {
 					if (logicMat[i][j] == 1) {	//Computer
-						this.vertexMat[i][j] = new CellVertex(new Point(j, i), PlayerEnum.COMPUTER);
+						this.vertexMat[i][j] = new Vertex(new Point(j, i), PlayerEnum.COMPUTER);
 					} else if (logicMat[i][j] == 2) {	//Player
-						this.vertexMat[i][j] = new CellVertex(new Point(j, i), PlayerEnum.PLAYER);
+						this.vertexMat[i][j] = new Vertex(new Point(j, i), PlayerEnum.PLAYER);
 					} else if (logicMat[i][j] == 0) {	//Empty
-						this.vertexMat[i][j] = new CellVertex(new Point(j, i), PlayerEnum.NONE);
-					}else { //bara el star
+						this.vertexMat[i][j] = new Vertex(new Point(j, i), PlayerEnum.NONE);
+					}else { //Out of the star
 						this.vertexMat[i][j] = null;
 					}
 				}
 			}
 		}
 
-		//GraphFacilities.CreateGraph();
-
 		tempX = tempY = level = 0;
-		activePlayer = PlayerEnum.PLAYER;
+		activePlayer = PlayerEnum.PLAYER;	//Player stars first
 	}
 
 	public void gameStart() {
-		BackPanelGraph menuPanel = new BackPanelGraph(null, null);
-
-		// JTextComponent text = new JTextComponent("Hello");
+		JPanel menuPanel = new JPanel();
 		easy = new JButton("Easy");
 		easy.setActionCommand("Easy");
 		easy.addActionListener(new OptionListener());
+		easy.setBounds(25, 20, 180, 95);
+
 		medium = new JButton("Medium");
 		medium.setActionCommand("Medium");
 		medium.addActionListener(new OptionListener());
+		medium.setBounds(25, 130, 180, 95);
+
 		hard = new JButton("Hard");
 		hard.setActionCommand("Hard");
 		hard.addActionListener(new OptionListener());
-		frame = new JFrame("Select Level: ");
+		hard.setBounds(25, 240, 180, 95);
+
 		menuPanel.setLayout(null);
 		menuPanel.setBounds(0, 0, 300, 450);
-		frame.setDefaultCloseOperation(3);
-		frame.setLocationRelativeTo(null);
-		frame.setSize(300, 430);
-		frame.setVisible(true);
-		frame.add(menuPanel);
-		Container c = frame.getContentPane();
-		c.setLayout(null);
 		menuPanel.add(easy);
 		menuPanel.add(medium);
 		menuPanel.add(hard);
 
-		easy.setBounds(25, 20, 180, 95);
-		medium.setBounds(25, 130, 180, 95);
-		hard.setBounds(25, 240, 180, 95);
+		frame = new JFrame("Select Level: ");
+		frame.add(menuPanel);
+		frame.setDefaultCloseOperation(3);
+		frame.setLocationRelativeTo(null);
+		frame.setSize(300, 430);
+		frame.setLayout(null);	
+		frame.setVisible(true);
 	}
 
 	public class OptionListener implements ActionListener {
@@ -157,27 +149,17 @@ public final class ChineseCheckersGraph {
 		}
 	}
 
-	// searches for all possible moves
-	public ArrayList<CellVertex> availableMoves(int x, int y) {
+	// Getting all possible next moves
+	public ArrayList<Vertex> availableMoves(int x, int y) {
 
-		ArrayList<CellVertex> availableVertices = new ArrayList<CellVertex>();
+		ArrayList<Vertex> availableVertices = new ArrayList<Vertex>();
 
-		
-
-/* 
-		CellVertex topRight = vertexMat[y-1][x+1];
-		CellVertex topLeft = vertexMat[y-1][x-1];
-		CellVertex right = vertexMat[y][x+2];
-		CellVertex left = vertexMat[y][x-2];
-		CellVertex bottomRight = vertexMat[y+1][x+1];
-		CellVertex bottomLeft = vertexMat[y+1][x-1];*/
-
-		CellVertex topRight = vertexMat[y-2][x+2];
-		CellVertex topLeft = vertexMat[y-2][x-2];
-		CellVertex right = vertexMat[y][x+4];
-		CellVertex left = vertexMat[y][x-4];
-		CellVertex bottomRight = vertexMat[y+2][x+2];
-		CellVertex bottomLeft = vertexMat[y+2][x-2];
+		Vertex topRight = vertexMat[y-1][x+1];
+		Vertex topLeft = vertexMat[y-1][x-1];
+		Vertex right = vertexMat[y][x+2];
+		Vertex left = vertexMat[y][x-2];
+		Vertex bottomRight = vertexMat[y+1][x+1];
+		Vertex bottomLeft = vertexMat[y+1][x-1];
 
 		if (topRight != null && topRight.content == 0) {
 			System.out.println("topRight: "+  topRight.getLocation());
@@ -209,7 +191,82 @@ public final class ChineseCheckersGraph {
 			availableVertices.add(bottomLeft);
 		}
 
+		return jump(availableVertices, x, y);
+	}
+
+	ArrayList<Vertex> jump(ArrayList<Vertex> availableVertices, int x, int y) {
+		Vertex JTopRight = vertexMat[y-2][x+2];
+		Vertex JTopLeft = vertexMat[y-2][x-2];
+		Vertex JRight = vertexMat[y][x+4];
+		Vertex JLeft = vertexMat[y][x-4];
+		Vertex JBottomRight = vertexMat[y+2][x+2];
+		Vertex JBottomLeft = vertexMat[y+2][x-2];
+
+		Vertex topRight = vertexMat[y-1][x+1];
+		Vertex topLeft = vertexMat[y-1][x-1];
+		Vertex right = vertexMat[y][x+2];
+		Vertex left = vertexMat[y][x-2];
+		Vertex bottomRight = vertexMat[y+1][x+1];
+		Vertex bottomLeft = vertexMat[y+1][x-1];
+
+		if (topRight != null && JTopRight != null && topRight.content != 0 && JTopRight.content == 0 && !JTopRight.isVisited()) {
+			vertexMat[y-2][x+2].setVisited(true);
+			System.out.println("topRight: "+  topRight.getLocation());
+			availableVertices.add(JTopRight);
+			availableVertices = jump(availableVertices, JTopRight.getLocation().x, JTopRight.getLocation().y);
+		}
+
+		if (topLeft != null && JTopLeft != null && topLeft.content != 0 && JTopLeft.content == 0 && !JTopLeft.isVisited()) {
+			vertexMat[y-2][x-2].setVisited(true);
+			System.out.println("topLeft: "+  topLeft.getLocation());
+			availableVertices.add(JTopLeft);
+			availableVertices = jump(availableVertices, JTopLeft.getLocation().x, JTopLeft.getLocation().y);
+		}
+
+		if (right != null && JRight != null && right.content != 0 && JRight.content == 0 && !JRight.isVisited()) {
+			vertexMat[y][x+4].setVisited(true);
+			System.out.println("right: "+  right.getLocation());
+			availableVertices.add(JRight);
+			availableVertices = jump(availableVertices, JRight.getLocation().x, JRight.getLocation().y);
+		}
+
+		if (left != null && JLeft != null && left.content != 0 && JLeft.content == 0 && !JLeft.isVisited()) {
+			vertexMat[y][x-4].setVisited(true);
+			System.out.println("left: "+  left.getLocation());
+			availableVertices.add(JLeft);
+			availableVertices = jump(availableVertices, JLeft.getLocation().x, JLeft.getLocation().y);
+		}
+
+		if (bottomRight != null && JBottomRight != null && bottomRight.content != 0 && JBottomRight.content == 0 && !JBottomRight.isVisited()) {
+			vertexMat[y+2][x+2].setVisited(true);
+			System.out.println("bottomRight: "+  bottomRight.getLocation());
+			availableVertices.add(JBottomRight);
+			availableVertices = jump(availableVertices, JBottomRight.getLocation().x, JBottomRight.getLocation().y);
+		}
+
+		if (bottomLeft != null && JBottomLeft != null && bottomLeft.content != 0 && JBottomLeft.content == 0 && !JBottomLeft.isVisited()) {
+			vertexMat[y+2][x-2].setVisited(true);
+			System.out.println("bottomLeft: "+  bottomLeft.getLocation());
+			availableVertices.add(JBottomLeft);
+			availableVertices = jump(availableVertices, JBottomLeft.getLocation().x, JBottomLeft.getLocation().y);
+		}
+
+
+		reset();
+
+
+
 		return availableVertices;
+	}
+	
+	public void reset() {
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if (vertexMat[i][j] != null && vertexMat[i][j].isVisited()) {
+					vertexMat[i][j].setVisited(false);
+				}
+			}
+		}
 	}
 
 	void move(int destX, int destY) {
@@ -218,6 +275,10 @@ public final class ChineseCheckersGraph {
 	}
 
 	// Setters and Getters
+	public boolean isRunning() {
+		return run;
+	}
+
 	public int getPlayer() {
 		return activePlayer;
 	}
