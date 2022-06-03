@@ -17,14 +17,29 @@ public class GraphFacilities {
 	public static CellVertex[][] vertexMat = new CellVertex[H][W];
 	public static Graph<CellVertex, CCEdge> g = new SimpleGraph<CellVertex, CCEdge>(CCEdge.class);
 
-	public static void CreateGraph(Point[][] edgeArr) {
+	public static void CreateGraph(/*Point[][] edgeArr*/) {
+
+		int counter = 0;
+
 		for (int i = 0; i < H; i++) {
 			for (int j = 0; j < W; j++) {
 				if (vertexMat[i][j] != null) {
 					g.addVertex(vertexMat[i][j]);
+					counter++;
 				}
 			}
 		}
+/* 
+		for (int i = 0; i < H; i++) {
+			for (int j = 0; j < W; j++) {
+				if (vertexMat[i][j] != null) {
+					System.out.println(vertexMat[i][j].getLocation());
+				}
+			}
+		}
+
+		System.out.println("Counter mn gwa: "   + counter);*/
+
 		/* 
 		for (int i = 0; i < edgeArr.length; i++) {
 			if (edgeArr[i].length == 2) {
