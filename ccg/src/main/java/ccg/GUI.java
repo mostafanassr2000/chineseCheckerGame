@@ -15,7 +15,7 @@ public class GUI extends JFrame implements Runnable {
    
     private Image img, redMarble, blueMarble, empty, optional;
     private BackJPanel[][] graphicMat;
-    private BackJPanel background;
+    public static BackJPanel background;
     private Game game;
     private Thread thread;
     private JFrame mainFrame;
@@ -71,7 +71,7 @@ public class GUI extends JFrame implements Runnable {
         }
 
         mainFrame.add(background);
-        game.gameStart();
+        game.startGame();
         thread = new Thread(this);
         thread.start();
         mainFrame.setLayout(null);

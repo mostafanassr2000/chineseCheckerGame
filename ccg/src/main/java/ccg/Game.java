@@ -3,7 +3,6 @@ package ccg;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-
 import javax.swing.*;
 
 public final class Game {
@@ -13,8 +12,10 @@ public final class Game {
 
 	public static final int H = 21, W = 33;
 	public static Vertex[][] vertexMat = new Vertex[H][W];
+	public ArrayList<Point> goals = new ArrayList<Point>();
 
-	private int tempX = 0, tempY = 0, activePlayer = 2, depth, winner;
+	private int tempX = 0, tempY = 0, activePlayer = 2, depth;
+	public int winner;
 
 	private int[][] logicMat = {
 			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
@@ -83,11 +84,13 @@ private Point[] playerSoldiers = new Point[] {
 			}
 		}
 
+
+
 		tempX = tempY = depth = 1;
 		activePlayer = PlayerEnum.PLAYER; // Player stars first
 	}
 
-	public void gameStart() {
+	public void startGame() {
 		JPanel panel = new JPanel();
 		easyLvl = new JButton("Easy");
 		easyLvl.setActionCommand("Easy");
@@ -129,13 +132,13 @@ private Point[] playerSoldiers = new Point[] {
 				frame.dispose();
 
 			} else if (e.getActionCommand().equals("Medium")) {
-				depth = 2; //Game Level
+				depth = 3; //Game Level
 				run = true;
 				frame.dispose();
 			}
 
 			else {
-				depth = 3; //Game Level
+				depth = 5; //Game Level
 				run = true;
 				frame.dispose();
 			}
@@ -148,7 +151,6 @@ private Point[] playerSoldiers = new Point[] {
 		makeVisitedFalse();
 		return availableVertices;
 	}
-
 
 	public ArrayList<Vertex> availableMoves(int x, int y) {
 
@@ -290,10 +292,21 @@ private Point[] playerSoldiers = new Point[] {
 	}
 
 	public void switchTurn(int activePlayer) {
-		if (activePlayer == PlayerEnum.PLAYER) {
-			this.activePlayer = PlayerEnum.COMPUTER;
-		} else {	//Computer
-			this.activePlayer = PlayerEnum.PLAYER;
+
+		if (!hasWon()) {   //Switch turns
+			if (activePlayer == PlayerEnum.PLAYER) {
+				this.activePlayer = PlayerEnum.COMPUTER;
+			} else {	//Computer
+				this.activePlayer = PlayerEnum.PLAYER;
+			}
+		} else {	  //Someone has won
+			if (winner == PlayerEnum.PLAYER) {
+				JOptionPane.showConfirmDialog(GUI.background, "Player has won!!", "Winner",
+				JOptionPane.CLOSED_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			}else { //Computer
+				JOptionPane.showConfirmDialog(GUI.background, "Computer has won!!", "Winner",
+				JOptionPane.CLOSED_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
 	}
 
@@ -328,7 +341,7 @@ private Point[] playerSoldiers = new Point[] {
 
 		Vertex goal = null;
 
-		for(int i = 0; i < playerSoldiers.length; i++) {
+		for(int i = playerSoldiers.length - 1; i >= 0; i--) {
 			int x = (int) playerSoldiers[i].getX();
 			int y = (int) playerSoldiers[i].getY();
 
@@ -337,7 +350,6 @@ private Point[] playerSoldiers = new Point[] {
 				break;
 			}
 		}
-
 
 		Movement bestMove = null;
 		double bestScore = Double.MAX_VALUE;
@@ -387,22 +399,13 @@ private Point[] playerSoldiers = new Point[] {
 				}
 			}
 			if(depth > 1 && !findNextMoves(copyBoard[bestPoint.y][bestPoint.x].getLocation().x, copyBoard[bestPoint.y][bestPoint.x].getLocation().y).isEmpty()){
-				System.out.println("Recursion: "+ depth);
 				bestMove = minmax(depth-1, copyBoard, copyBoard[baseBestMove.src.y][baseBestMove.src.x], goal, true);
 			}
 			else{
-				System.out.println("Recursion return: "+ depth);
 				return baseBestMove;
 			}
-			
 		}
-		else{
-			
-		}
-
 		return bestMove;
-		
-
 	}
 
 	Vertex[][] simulateMove(int destX, int destY, int srcX, int srcY, Vertex[][] copyBoard) {
@@ -424,7 +427,6 @@ private Point[] playerSoldiers = new Point[] {
 
 		return tempBoard;
 	}
-
 
 	public double heuristicFun(Vertex copyBoard[][], Vertex goal) {
 
