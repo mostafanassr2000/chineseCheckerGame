@@ -122,7 +122,7 @@ public class GUI extends JFrame implements Runnable {
 
                         mainFrame.repaint();
 
-                    } else if (game.vertexMat[row][col].content == 0) { // Move Vertix to empty cell
+                    } else if (game.vertexMat[row][col].content == 0 && availableVertices.contains(game.vertexMat[row][col])) { // Move Vertix to empty cell
 
                         for (int i = 0; i < availableVertices.size(); i++) {
                             int x = (int) availableVertices.get(i).getLocation().getX();
@@ -199,17 +199,12 @@ public class GUI extends JFrame implements Runnable {
     }
 
     @Override
-    public void run()  {
+    public void run() {
         while (game.getPlayer() != PlayerEnum.NONE) {
 
             if (game.getPlayer() == PlayerEnum.COMPUTER) {
                 //game.AI(1);
-            
-
                 game.call();
-         
-
-
                 updateGame();
                 game.switchTurn(game.getPlayer());
             }
