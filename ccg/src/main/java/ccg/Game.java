@@ -3,7 +3,9 @@ package ccg;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,7 +18,6 @@ public final class Game {
 	private JFrame frame;
 	private JButton easy, medium, hard;
 	private boolean run = false;
-
 
 	public static final int H = 21, W = 33;
 	public static Vertex[][] vertexMat = new Vertex[H][W];
@@ -33,57 +34,72 @@ public final class Game {
 			{ 3, 13 },
 			{ 3, 15 }
 	};
-	private int tempX = 0, tempY = 0, activePlayer = 2, level;
+	private int tempX = 0, tempY = 0, activePlayer = 2, level, winner;
 	// public static GraphFacilities graph;
 	private int[][] logicMat = {
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 1, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 2, 9, 2, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 2, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
-			{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 9, 1, 9, 1, 9, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 2, 9, 2, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 2, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
+			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
 	};
 	// private Point[][] coordMat;
-	private Point[] cpuSoldiers = new Point[] {
-			new Point(12, 0),
-			new Point(11, 1),
-			new Point(13, 1),
-			new Point(10, 2),
-			new Point(12, 2),
-			new Point(14, 2),
-			new Point(9, 3),
-			new Point(11, 3),
-			new Point(13, 3),
-			new Point(15, 3)
-	};
+	private Point[] computerSoldiers = new Point[] {
+		new Point(16, 2),
+		new Point(15, 3),
+		new Point(17, 3),
+		new Point(14, 4),
+		new Point(16, 4),
+		new Point(18, 4),
+		new Point(13, 5),
+		new Point(15, 5),
+		new Point(17, 5),
+		new Point(19, 5)
+};
+
+private Point[] playerSoldiers = new Point[] {
+	new Point(13, 15),
+	new Point(15, 15),
+	new Point(17, 15),
+	new Point(19, 15),
+	new Point(14, 16),
+	new Point(16, 16),
+	new Point(18, 16),
+	new Point(15, 17),
+	new Point(17, 17),
+	new Point(16, 18)
+};
+
+	HashMap<Vertex, ArrayList<Vertex>> availableNodes = new HashMap<>();
 	// private int coordIndex;
 
 	public Game() {
 		for (int i = 0; i < logicMat.length; i++) {
 			for (int j = 0; j < logicMat[i].length; j++) {
 				if (this.vertexMat[i][j] == null) {
-					if (logicMat[i][j] == 1) {	//Computer
+					if (logicMat[i][j] == 1) { // Computer
 						this.vertexMat[i][j] = new Vertex(new Point(j, i), PlayerEnum.COMPUTER);
-					} else if (logicMat[i][j] == 2) {	//Player
+					} else if (logicMat[i][j] == 2) { // Player
 						this.vertexMat[i][j] = new Vertex(new Point(j, i), PlayerEnum.PLAYER);
-					} else if (logicMat[i][j] == 0) {	//Empty
+					} else if (logicMat[i][j] == 0) { // Empty
 						this.vertexMat[i][j] = new Vertex(new Point(j, i), PlayerEnum.NONE);
-					}else { //Out of the star
+					} else { // Out of the star
 						this.vertexMat[i][j] = null;
 					}
 				}
@@ -91,7 +107,7 @@ public final class Game {
 		}
 
 		tempX = tempY = level = 0;
-		activePlayer = PlayerEnum.PLAYER;	//Player stars first
+		activePlayer = PlayerEnum.PLAYER; // Player stars first
 	}
 
 	public void gameStart() {
@@ -122,7 +138,7 @@ public final class Game {
 		frame.setDefaultCloseOperation(3);
 		frame.setLocationRelativeTo(null);
 		frame.setSize(300, 430);
-		frame.setLayout(null);	
+		frame.setLayout(null);
 		frame.setVisible(true);
 	}
 
@@ -154,40 +170,40 @@ public final class Game {
 
 		ArrayList<Vertex> availableVertices = new ArrayList<Vertex>();
 
-		Vertex topRight = vertexMat[y-1][x+1];
-		Vertex topLeft = vertexMat[y-1][x-1];
-		Vertex right = vertexMat[y][x+2];
-		Vertex left = vertexMat[y][x-2];
-		Vertex bottomRight = vertexMat[y+1][x+1];
-		Vertex bottomLeft = vertexMat[y+1][x-1];
+		Vertex topRight = vertexMat[y - 1][x + 1];
+		Vertex topLeft = vertexMat[y - 1][x - 1];
+		Vertex right = vertexMat[y][x + 2];
+		Vertex left = vertexMat[y][x - 2];
+		Vertex bottomRight = vertexMat[y + 1][x + 1];
+		Vertex bottomLeft = vertexMat[y + 1][x - 1];
 
 		if (topRight != null && topRight.content == 0) {
-			System.out.println("topRight: "+  topRight.getLocation());
+			System.out.println("topRight: " + topRight.getLocation());
 			availableVertices.add(topRight);
 		}
-	
+
 		if (topLeft != null && topLeft.content == 0) {
-			System.out.println("topLeft: "+  topLeft.getLocation());
+			System.out.println("topLeft: " + topLeft.getLocation());
 			availableVertices.add(topLeft);
 		}
 
 		if (right != null && right.content == 0) {
-			System.out.println("right: "+  right.getLocation());
+			System.out.println("right: " + right.getLocation());
 			availableVertices.add(right);
 		}
 
 		if (left != null && left.content == 0) {
-			System.out.println("left: "+  left.getLocation());
+			System.out.println("left: " + left.getLocation());
 			availableVertices.add(left);
 		}
 
 		if (bottomRight != null && bottomRight.content == 0) {
-			System.out.println("bottomRight: "+  bottomRight.getLocation());
+			System.out.println("bottomRight: " + bottomRight.getLocation());
 			availableVertices.add(bottomRight);
 		}
 
 		if (bottomLeft != null && bottomLeft.content == 0) {
-			System.out.println("bottomLeft: "+  bottomLeft.getLocation());
+			System.out.println("bottomLeft: " + bottomLeft.getLocation());
 			availableVertices.add(bottomLeft);
 		}
 
@@ -195,70 +211,71 @@ public final class Game {
 	}
 
 	ArrayList<Vertex> jump(ArrayList<Vertex> availableVertices, int x, int y) {
-		Vertex JTopRight = vertexMat[y-2][x+2];
-		Vertex JTopLeft = vertexMat[y-2][x-2];
-		Vertex JRight = vertexMat[y][x+4];
-		Vertex JLeft = vertexMat[y][x-4];
-		Vertex JBottomRight = vertexMat[y+2][x+2];
-		Vertex JBottomLeft = vertexMat[y+2][x-2];
+		Vertex JTopRight = vertexMat[y - 2][x + 2];
+		Vertex JTopLeft = vertexMat[y - 2][x - 2];
+		Vertex JRight = vertexMat[y][x + 4];
+		Vertex JLeft = vertexMat[y][x - 4];
+		Vertex JBottomRight = vertexMat[y + 2][x + 2];
+		Vertex JBottomLeft = vertexMat[y + 2][x - 2];
 
-		Vertex topRight = vertexMat[y-1][x+1];
-		Vertex topLeft = vertexMat[y-1][x-1];
-		Vertex right = vertexMat[y][x+2];
-		Vertex left = vertexMat[y][x-2];
-		Vertex bottomRight = vertexMat[y+1][x+1];
-		Vertex bottomLeft = vertexMat[y+1][x-1];
+		Vertex topRight = vertexMat[y - 1][x + 1];
+		Vertex topLeft = vertexMat[y - 1][x - 1];
+		Vertex right = vertexMat[y][x + 2];
+		Vertex left = vertexMat[y][x - 2];
+		Vertex bottomRight = vertexMat[y + 1][x + 1];
+		Vertex bottomLeft = vertexMat[y + 1][x - 1];
 
-		if (topRight != null && JTopRight != null && topRight.content != 0 && JTopRight.content == 0 && !JTopRight.isVisited()) {
-			vertexMat[y-2][x+2].setVisited(true);
-			System.out.println("topRight: "+  topRight.getLocation());
+		if (topRight != null && JTopRight != null && topRight.content != 0 && JTopRight.content == 0
+				&& !JTopRight.isVisited()) {
+			vertexMat[y - 2][x + 2].setVisited(true);
+			System.out.println("topRight: " + topRight.getLocation());
 			availableVertices.add(JTopRight);
 			availableVertices = jump(availableVertices, JTopRight.getLocation().x, JTopRight.getLocation().y);
 		}
 
-		if (topLeft != null && JTopLeft != null && topLeft.content != 0 && JTopLeft.content == 0 && !JTopLeft.isVisited()) {
-			vertexMat[y-2][x-2].setVisited(true);
-			System.out.println("topLeft: "+  topLeft.getLocation());
+		if (topLeft != null && JTopLeft != null && topLeft.content != 0 && JTopLeft.content == 0
+				&& !JTopLeft.isVisited()) {
+			vertexMat[y - 2][x - 2].setVisited(true);
+			System.out.println("topLeft: " + topLeft.getLocation());
 			availableVertices.add(JTopLeft);
 			availableVertices = jump(availableVertices, JTopLeft.getLocation().x, JTopLeft.getLocation().y);
 		}
 
 		if (right != null && JRight != null && right.content != 0 && JRight.content == 0 && !JRight.isVisited()) {
-			vertexMat[y][x+4].setVisited(true);
-			System.out.println("right: "+  right.getLocation());
+			vertexMat[y][x + 4].setVisited(true);
+			System.out.println("right: " + right.getLocation());
 			availableVertices.add(JRight);
 			availableVertices = jump(availableVertices, JRight.getLocation().x, JRight.getLocation().y);
 		}
 
 		if (left != null && JLeft != null && left.content != 0 && JLeft.content == 0 && !JLeft.isVisited()) {
-			vertexMat[y][x-4].setVisited(true);
-			System.out.println("left: "+  left.getLocation());
+			vertexMat[y][x - 4].setVisited(true);
+			System.out.println("left: " + left.getLocation());
 			availableVertices.add(JLeft);
 			availableVertices = jump(availableVertices, JLeft.getLocation().x, JLeft.getLocation().y);
 		}
 
-		if (bottomRight != null && JBottomRight != null && bottomRight.content != 0 && JBottomRight.content == 0 && !JBottomRight.isVisited()) {
-			vertexMat[y+2][x+2].setVisited(true);
-			System.out.println("bottomRight: "+  bottomRight.getLocation());
+		if (bottomRight != null && JBottomRight != null && bottomRight.content != 0 && JBottomRight.content == 0
+				&& !JBottomRight.isVisited()) {
+			vertexMat[y + 2][x + 2].setVisited(true);
+			System.out.println("bottomRight: " + bottomRight.getLocation());
 			availableVertices.add(JBottomRight);
 			availableVertices = jump(availableVertices, JBottomRight.getLocation().x, JBottomRight.getLocation().y);
 		}
 
-		if (bottomLeft != null && JBottomLeft != null && bottomLeft.content != 0 && JBottomLeft.content == 0 && !JBottomLeft.isVisited()) {
-			vertexMat[y+2][x-2].setVisited(true);
-			System.out.println("bottomLeft: "+  bottomLeft.getLocation());
+		if (bottomLeft != null && JBottomLeft != null && bottomLeft.content != 0 && JBottomLeft.content == 0
+				&& !JBottomLeft.isVisited()) {
+			vertexMat[y + 2][x - 2].setVisited(true);
+			System.out.println("bottomLeft: " + bottomLeft.getLocation());
 			availableVertices.add(JBottomLeft);
 			availableVertices = jump(availableVertices, JBottomLeft.getLocation().x, JBottomLeft.getLocation().y);
 		}
 
-
 		reset();
-
-
 
 		return availableVertices;
 	}
-	
+
 	public void reset() {
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
@@ -269,9 +286,91 @@ public final class Game {
 		}
 	}
 
+	boolean hasWon() {
+		if (activePlayer == PlayerEnum.PLAYER) {
+			for (int i = 0; i < computerSoldiers.length; i++) {
+				int x = computerSoldiers[i].x;
+				int y = computerSoldiers[i].y;
+				
+				if (vertexMat[y][x].content != PlayerEnum.PLAYER) {
+					return false;
+				}
+			}
+			winner = PlayerEnum.PLAYER;	//Player has won
+			return true;
+		} else {	//Computer
+			for (int i = 0; i < playerSoldiers.length; i++) {
+				int x = playerSoldiers[i].x;
+				int y = playerSoldiers[i].y;
+				
+				if (vertexMat[y][x].content != PlayerEnum.COMPUTER) {
+					return false;
+				}
+			}
+			winner = PlayerEnum.COMPUTER;	//Computer has won
+			return true;
+		}
+	}
+
+	public void switchTurn(int activePlayer) {
+		if (activePlayer == PlayerEnum.PLAYER) {
+			this.activePlayer = PlayerEnum.COMPUTER;
+		} else {	//Computer
+			this.activePlayer = PlayerEnum.PLAYER;
+		}
+	}
+
 	void move(int destX, int destY) {
 		vertexMat[tempY][tempX].content = PlayerEnum.NONE;
 		vertexMat[destY][destX].content = activePlayer;
+	}
+
+	void AIMove(int destX, int destY, int tempX, int tempY) {
+		vertexMat[tempY][tempX].content = PlayerEnum.NONE;
+		vertexMat[destY][destX].content = activePlayer;
+	}
+
+	public void AI(int level){
+		int max = 18, min = Integer.MAX_VALUE;
+		Point goal = new Point(16,18), bestMove = new Point();
+		Vertex bestVertex = new Vertex(new Point());
+		Utility();
+		if (level == 1){
+			for(Map.Entry<Vertex, ArrayList<Vertex>> entry : availableNodes.entrySet()) {
+				for(Vertex move: entry.getValue()) {
+					if (goal.y - move.getLocation().y < max){
+						System.out.println("Best move: " + move.getLocation());
+						max = goal.y - move.getLocation().y;
+						bestMove = move.getLocation();
+						bestVertex = entry.getKey();
+					}
+				}
+			}
+			System.out.println("Best move: " + bestMove.getLocation());
+			AIMove(bestMove.x, bestMove.y, bestVertex.getLocation().x, bestVertex.getLocation().y);
+		}else if(level==2){
+
+		}else if(level==3){
+
+		}
+	}
+
+	public void Utility() {
+		
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if(vertexMat[i][j] != null &&
+				vertexMat[i][j].getContent() == PlayerEnum.COMPUTER &&
+				!availableMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y).isEmpty()){
+					availableNodes.put(vertexMat[i][j], availableMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y));
+					break;
+				}
+			}
+		}
+		
+
+
+
 	}
 
 	// Setters and Getters
@@ -298,7 +397,6 @@ public final class Game {
 	public void setTempX(int x) {
 		tempX = x;
 	}
-	
 
 	/*
 	 * 

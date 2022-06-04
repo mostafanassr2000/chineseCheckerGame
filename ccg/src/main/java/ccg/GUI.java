@@ -154,10 +154,16 @@ public class GUI extends JFrame implements Runnable {
                         
                         
                         updateGame();
+                        game.switchTurn(game.getPlayer());
                         
                         // cc.endTurn();
                     }
                     // reImage();
+                } else if (game.getPlayer() == 1){
+                    game.AI(1);
+                    updateGame();
+                    game.switchTurn(game.getPlayer());
+                    
                 }
             }
         }
