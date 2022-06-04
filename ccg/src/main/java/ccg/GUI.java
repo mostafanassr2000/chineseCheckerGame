@@ -4,7 +4,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,12 +11,11 @@ import javax.swing.*;
 
 public class GUI extends JFrame implements Runnable {
 
-    private final double DIF_H = 47, DIF_W = 27.5, OFFSET_Y = -94, OFFSET_X = -108; // -15, -5
-    private final double PLAYER_OFFSET_Y = -110, PLAYER_OFFSET_X = -118; // -15, -5
-
+    private final double DIF_H = 47, DIF_W = 27.5, OFFSET_Y = -94, OFFSET_X = -108; 
+   
     private Image img, redMarble, blueMarble, empty, optional;
     private BackJPanel[][] graphicMat;
-    private BackJPanel background;
+    public static BackJPanel background;
     private Game game;
     private Thread thread;
     private JFrame mainFrame;
@@ -35,7 +33,7 @@ public class GUI extends JFrame implements Runnable {
         background = new BackJPanel(img, null);
         background.setLayout(null);
         background.setBounds(0, 0, 720, 800); // 800
-        background.addMouseListener(new MouseAction());
+        background.addMouseListener(new PerformMouseAction());
         availableVertices = new ArrayList<Vertex>();
 
         redMarble = (new ImageIcon(this.getClass().getClassLoader().getResource("ccg/Assets/red#1.png")))
@@ -66,14 +64,14 @@ public class GUI extends JFrame implements Runnable {
                     graphicMat[i][j].setBounds((int) Math.round(OFFSET_X + (j * DIF_W)),
                             (int) Math.round(OFFSET_Y + (i * DIF_H)), 55, 47);
                     graphicMat[i][j].setOpaque(false);
-                    graphicMat[i][j].addMouseListener(new MouseAction(i, j));
+                    graphicMat[i][j].addMouseListener(new PerformMouseAction(i, j));
                     background.add(graphicMat[i][j]);
                 }
             }
         }
 
         mainFrame.add(background);
-        game.gameStart();
+        game.startGame();
         thread = new Thread(this);
         thread.start();
         mainFrame.setLayout(null);
@@ -81,20 +79,20 @@ public class GUI extends JFrame implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-        new GUI("Batta Checker Game");
+        new GUI("Chinese Checker Game");
     }
 
-    public class MouseAction implements MouseListener {
+    public class PerformMouseAction implements MouseListener {
 
         private int row;
         private int col;
 
-        public MouseAction(int row, int col) {
+        public PerformMouseAction(int row, int col) {
             this.row = row;
             this.col = col;
         }
 
-        public MouseAction() {
+        public PerformMouseAction() {
             super();
         }
 
@@ -107,10 +105,10 @@ public class GUI extends JFrame implements Runnable {
                 if (game.getPlayer() == 2) { // Player
                     if (game.vertexMat[row][col].content == game.getPlayer()) {
 
-                        clearOptionals(); // Clearing all optional vertices
+                        clearAvailableVertices(); // Clearing all available vertices
 
-                        game.setTempX(col); // x
-                        game.setTempY(row); // y
+                        game.setTempX(col); 
+                        game.setTempY(row); 
 
                         availableVertices = game.findNextMoves(game.getTempX(), game.getTempY());
 
@@ -118,11 +116,10 @@ public class GUI extends JFrame implements Runnable {
                             int x = (int) availableVertices.get(i).getLocation().getX();
                             int y = (int) availableVertices.get(i).getLocation().getY();
                             graphicMat[y][x].setImg(optional);
+
                         }
-
-                        mainFrame.repaint();
-
-                    } else if (game.vertexMat[row][col].content == 0) { // Move Vertix to empty cell
+                    } else if (game.vertexMat[row][col].content == 0
+                            && availableVertices.contains(game.vertexMat[row][col])) { // Move Vertix to empty cell
 
                         for (int i = 0; i < availableVertices.size(); i++) {
                             int x = (int) availableVertices.get(i).getLocation().getX();
@@ -138,34 +135,28 @@ public class GUI extends JFrame implements Runnable {
                         updateGame();
                         game.switchTurn(game.getPlayer());
                     }
-
                 }
             }
         }
 
         @Override
         public void mouseEntered(MouseEvent arg0) {
-
         }
 
         @Override
         public void mouseExited(MouseEvent arg0) {
-            // TODO Auto-generated method stub
         }
 
         @Override
         public void mousePressed(MouseEvent arg0) {
-            // TODO Auto-generated method stub
-
         }
 
         @Override
         public void mouseReleased(MouseEvent arg0) {
-            // TODO Auto-generated method stub
         }
     }
 
-    public void clearOptionals() {
+    public void clearAvailableVertices() {
         for (int i = 0; i < availableVertices.size(); i++) {
             int x = (int) availableVertices.get(i).getLocation().getX();
             int y = (int) availableVertices.get(i).getLocation().getY();
@@ -190,7 +181,6 @@ public class GUI extends JFrame implements Runnable {
                             graphicMat[i][j].setImg(empty);
                             break;
                     }
-
                 }
             }
         }
@@ -199,25 +189,19 @@ public class GUI extends JFrame implements Runnable {
     }
 
     @Override
-    public void run()  {
+    public void run() {
         while (game.getPlayer() != PlayerEnum.NONE) {
 
             if (game.getPlayer() == PlayerEnum.COMPUTER) {
-                //game.AI(1);
-            
-
-                game.call();
-         
-
-
+                game.callAI();
                 updateGame();
                 game.switchTurn(game.getPlayer());
             }
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
+
                 e.printStackTrace();
             }
         }
