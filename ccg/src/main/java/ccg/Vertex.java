@@ -7,6 +7,7 @@ public class Vertex {
 	public int content;
 	private Point point;
 	private boolean visited;
+	public double score;
 
 	public Vertex(Point l) {
 		this(l, 0);
@@ -33,6 +34,8 @@ public class Vertex {
 	public void setVisited(boolean visited) {
 		this.visited = visited;
 	}
+
+
 
 
 	/* 

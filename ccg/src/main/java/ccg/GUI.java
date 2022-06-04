@@ -12,17 +12,16 @@ import javax.swing.*;
 
 public class GUI extends JFrame implements Runnable {
 
-    private final double DIF_H = 47, DIF_W = 27.5, OFFSET_Y = -94, OFFSET_X = -108; //-15, -5
-    private final double PLAYER_OFFSET_Y = -110, PLAYER_OFFSET_X = -118; //-15, -5
+    private final double DIF_H = 47, DIF_W = 27.5, OFFSET_Y = -94, OFFSET_X = -108; // -15, -5
+    private final double PLAYER_OFFSET_Y = -110, PLAYER_OFFSET_X = -118; // -15, -5
 
     private Image img, redMarble, blueMarble, empty, optional;
     private BackJPanel[][] graphicMat;
     private BackJPanel background;
     private Game game;
     private Thread thread;
-    private JFrame mainFrame; 
+    private JFrame mainFrame;
     ArrayList<Vertex> availableVertices;
-
 
     public GUI(String text) throws IOException {
         mainFrame = new JFrame(text);
@@ -35,13 +34,13 @@ public class GUI extends JFrame implements Runnable {
 
         background = new BackJPanel(img, null);
         background.setLayout(null);
-        background.setBounds(0, 0, 720, 800);   //800
+        background.setBounds(0, 0, 720, 800); // 800
         background.addMouseListener(new MouseAction());
         availableVertices = new ArrayList<Vertex>();
 
-        redMarble = (new ImageIcon(this.getClass().getClassLoader().getResource("ccg/Assets/RedMarble.png")))
+        redMarble = (new ImageIcon(this.getClass().getClassLoader().getResource("ccg/Assets/red#1.png")))
                 .getImage();
-        blueMarble = (new ImageIcon(this.getClass().getClassLoader().getResource("ccg/Assets/black_1.png")))
+        blueMarble = (new ImageIcon(this.getClass().getClassLoader().getResource("ccg/Assets/green#1.png")))
                 .getImage();
         optional = (new ImageIcon(this.getClass().getClassLoader().getResource("ccg/Assets/optinal.png"))).getImage();
 
@@ -59,12 +58,10 @@ public class GUI extends JFrame implements Runnable {
                             graphicMat[i][j] = new BackJPanel(blueMarble, new Point(j, i));
                             break;
                         default:
-                          
+
                             graphicMat[i][j] = new BackJPanel(empty, new Point(j, i));
                             break;
                     }
-
-
 
                     graphicMat[i][j].setBounds((int) Math.round(OFFSET_X + (j * DIF_W)),
                             (int) Math.round(OFFSET_Y + (i * DIF_H)), 55, 47);
@@ -75,9 +72,6 @@ public class GUI extends JFrame implements Runnable {
             }
         }
 
-       
-        // CcMenuBar cMenuBar=new CcMenuBar(cc,this);
-        // setJMenuBar(cMenuBar);
         mainFrame.add(background);
         game.gameStart();
         thread = new Thread(this);
@@ -87,12 +81,7 @@ public class GUI extends JFrame implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-
-        // System.out.println("Hello world");
-        // JOptionPane.showMessageDialog(null, "Hello world");
-
         new GUI("Batta Checker Game");
-
     }
 
     public class MouseAction implements MouseListener {
@@ -117,15 +106,14 @@ public class GUI extends JFrame implements Runnable {
             } else {
                 if (game.getPlayer() == 2) { // Player
                     if (game.vertexMat[row][col].content == game.getPlayer()) {
-                        //System.out.println(col + ", " + row);
-                        
-                        clearOptionals();   //Clearing all optional vertices
+
+                        clearOptionals(); // Clearing all optional vertices
 
                         game.setTempX(col); // x
                         game.setTempY(row); // y
-                        // cc.resetBoard();
-                        availableVertices = game.availableMoves(game.getTempX(), game.getTempY());
-                                             
+
+                        availableVertices = game.findNextMoves(game.getTempX(), game.getTempY());
+
                         for (int i = 0; i < availableVertices.size(); i++) {
                             int x = (int) availableVertices.get(i).getLocation().getX();
                             int y = (int) availableVertices.get(i).getLocation().getY();
@@ -134,36 +122,23 @@ public class GUI extends JFrame implements Runnable {
 
                         mainFrame.repaint();
 
-                    } else if (game.vertexMat[row][col].content == 0) {   //Move Vertix to empty cell
+                    } else if (game.vertexMat[row][col].content == 0) { // Move Vertix to empty cell
 
                         for (int i = 0; i < availableVertices.size(); i++) {
                             int x = (int) availableVertices.get(i).getLocation().getX();
                             int y = (int) availableVertices.get(i).getLocation().getY();
 
-                            if (row == y && col == x) { //Vertix exists
-                                //System.out.println("exists");
+                            if (row == y && col == x) { // Vertix exists
+                                // System.out.println("exists");
                                 game.move(col, row);
                                 availableVertices.remove(availableVertices.get(i));
                                 break;
                             }
                         }
-
-
-
-                        //clearOptionals();   //Clearing all optional vertices
-                        
-                        
                         updateGame();
                         game.switchTurn(game.getPlayer());
-                        
-                        // cc.endTurn();
                     }
-                    // reImage();
-                } else if (game.getPlayer() == 1){
-                    game.AI(1);
-                    updateGame();
-                    game.switchTurn(game.getPlayer());
-                    
+
                 }
             }
         }
@@ -190,7 +165,6 @@ public class GUI extends JFrame implements Runnable {
         }
     }
 
-
     public void clearOptionals() {
         for (int i = 0; i < availableVertices.size(); i++) {
             int x = (int) availableVertices.get(i).getLocation().getX();
@@ -212,7 +186,7 @@ public class GUI extends JFrame implements Runnable {
                         case PlayerEnum.PLAYER:
                             graphicMat[i][j].setImg(blueMarble);
                             break;
-                        default:    //PlayerEnum.NONE
+                        default: // PlayerEnum.NONE
                             graphicMat[i][j].setImg(empty);
                             break;
                     }
@@ -224,20 +198,16 @@ public class GUI extends JFrame implements Runnable {
         mainFrame.repaint();
     }
 
-
-
     @Override
     public void run() {
         while (game.getPlayer() != PlayerEnum.NONE) {
-            /*
-             * if (cc.getPlayer() == 1 && cc.getStatus() == 1) {
-             * //JOptionPane.showConfirmDialog(null, "Computer Thinking.....Done!", "CPU",
-             * JOptionPane.CLOSED_OPTION, JOptionPane.INFORMATION_MESSAGE);
-             * cc.AI();
-             * cc.endTurn();
-             * reImage();
-             * }
-             */
+
+            if (game.getPlayer() == PlayerEnum.COMPUTER) {
+                //game.AI(1);
+                game.call();
+                updateGame();
+                game.switchTurn(game.getPlayer());
+            }
 
             try {
                 Thread.sleep(100);

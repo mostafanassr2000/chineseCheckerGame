@@ -166,6 +166,13 @@ private Point[] playerSoldiers = new Point[] {
 	}
 
 	// Getting all possible next moves
+	public ArrayList<Vertex> findNextMoves(int x, int y) {
+		ArrayList<Vertex> availableVertices = availableMoves(x, y);
+		reset();
+		return availableVertices;
+	}
+
+
 	public ArrayList<Vertex> availableMoves(int x, int y) {
 
 		ArrayList<Vertex> availableVertices = new ArrayList<Vertex>();
@@ -271,7 +278,7 @@ private Point[] playerSoldiers = new Point[] {
 			availableVertices = jump(availableVertices, JBottomLeft.getLocation().x, JBottomLeft.getLocation().y);
 		}
 
-		reset();
+		
 
 		return availableVertices;
 	}
@@ -332,17 +339,21 @@ private Point[] playerSoldiers = new Point[] {
 
 	public void AI(int level){
 		int max = 18, min = Integer.MAX_VALUE;
-		Point goal = new Point(16,18), bestMove = new Point();
+		Point currentGoal, bestMove = new Point();
 		Vertex bestVertex = new Vertex(new Point());
 		Utility();
 		if (level == 1){
 			for(Map.Entry<Vertex, ArrayList<Vertex>> entry : availableNodes.entrySet()) {
 				for(Vertex move: entry.getValue()) {
-					if (goal.y - move.getLocation().y < max){
-						System.out.println("Best move: " + move.getLocation());
-						max = goal.y - move.getLocation().y;
-						bestMove = move.getLocation();
-						bestVertex = entry.getKey();
+
+					for (int i = 0; i < playerSoldiers.length; i++) {
+						currentGoal = new Point(playerSoldiers[i].x, playerSoldiers[i].y);
+						if (currentGoal.y - move.getLocation().y < max){
+							System.out.println("Best move: " + move.getLocation());
+							max = currentGoal.y - move.getLocation().y;
+							bestMove = move.getLocation();
+							bestVertex = entry.getKey();
+						}
 					}
 				}
 			}
@@ -361,17 +372,167 @@ private Point[] playerSoldiers = new Point[] {
 			for (int j = 0; j < this.W; j++) {
 				if(vertexMat[i][j] != null &&
 				vertexMat[i][j].getContent() == PlayerEnum.COMPUTER &&
-				!availableMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y).isEmpty()){
-					availableNodes.put(vertexMat[i][j], availableMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y));
+				!findNextMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y).isEmpty()){
+					availableNodes.put(vertexMat[i][j], findNextMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y));
 					break;
 				}
 			}
 		}
+	}
+
+	public void call() {
+		int depth = 1;
+		Vertex[][] tempBoard = new Vertex[H][W];
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				tempBoard[i][j] = vertexMat[i][j];
+			}
+		}
+
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if (vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
+					vertices.add(vertexMat[i][j]);
+				}
+			}
+
+
+		}
+
+		Vertex goal = null;
+
+		for(int i = 0; i < playerSoldiers.length; i++) {
+			int x = (int) playerSoldiers[i].getX();
+			int y = (int) playerSoldiers[i].getY();
+
+			if (this.vertexMat[y][x].content != 1) {	//Computer
+				goal = this.vertexMat[y][x];
+				break;
+			}
+		}
+
+
+		minmax(depth, tempBoard, vertices, goal);
+	}
+
+	public Vertex minmax(int depth, Vertex copyBoard[][], ArrayList<Vertex> vertices, Vertex goal) {
+
+		ArrayList<Vertex> possibleMoves;
+		ArrayList<Vertex> all = new ArrayList<Vertex>();
+		Vertex tempBoard[][] =  new Vertex[H][W];
+		
+		double score = Double.MAX_VALUE;
+		double tmpScore;
+
+ 		//double score = Her(vertices, goal);
+		
+		for (Vertex vertix : vertices) {
+			possibleMoves = findNextMoves((int) vertix.getLocation().getX(), (int) vertix.getLocation().getY());
+
+			for (Vertex vertexMove : possibleMoves) {
+				Vertex newBoard[][] = new Vertex[H][W];
+				
+				newBoard = AIMove2((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY(), (int) vertix.getLocation().getX(), (int) vertix.getLocation().getY(), copyBoard);
+				//break;
+
+				
+				
+				if (Her(newBoard, goal) < score) {
+					score = Her(newBoard, goal);
+					System.out.println("Score: " + score);
+					for (int i = 0; i < this.H; i++) {
+						for (int j = 0; j < this.W; j++) {
+							tempBoard[i][j] = newBoard[i][j];
+						}
+					}
+				}
+
+				newBoard = null;
+			}
+			/* 
+			if (possibleMoves.size() != 0) {
+				break;
+			}*/
+
 		
 
+			//all.addAll(0, possibleMoves);
+		}
 
 
+
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				this.vertexMat[i][j] = tempBoard[i][j];
+			}
+		}
+
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if (this.vertexMat[i][j] == null) {
+					System.out.print("9 ");
+				}
+				else if (this.vertexMat[i][j].content == 1) {
+					System.out.print("1 ");
+				}
+
+				else if (this.vertexMat[i][j].content == 2) {
+					System.out.print("2 ");
+				}
+
+				else if (this.vertexMat[i][j].content == 0) {
+					System.out.print("0 ");
+				}
+			}
+			System.out.println("");
+		}
+
+		return null;
 	}
+
+	Vertex[][] AIMove2(int destX, int destY, int srcX, int srcY, Vertex[][] vertexMat) {
+
+		Vertex[][] tempBoard = new Vertex[H][W];
+
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				tempBoard[i][j] = vertexMat[i][j];
+			}
+		}
+
+		tempBoard[srcY][srcX].content = PlayerEnum.NONE;
+		tempBoard[destY][destX].content = PlayerEnum.COMPUTER;
+
+		return tempBoard;
+	}
+
+
+	public double Her(Vertex copyBoard[][], Vertex goal) {
+
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if (vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
+					vertices.add(copyBoard[i][j]);
+				}
+			}
+		}
+
+		int sum = 0;
+		for (Vertex vertix : vertices) {
+			sum += Math.sqrt(Math.pow(goal.getLocation().getX() - vertix.getLocation().getX(), 2) + Math.pow(goal.getLocation().getY() - vertix.getLocation().getY(), 2));
+		}
+
+		return sum;
+	}
+
+
+
+
+
 
 	// Setters and Getters
 	public boolean isRunning() {
@@ -380,6 +541,10 @@ private Point[] playerSoldiers = new Point[] {
 
 	public int getPlayer() {
 		return activePlayer;
+	}
+
+	public void setActivePlayer(int x) {
+		this.activePlayer = x;
 	}
 
 	public int getTempY() {
