@@ -2,27 +2,19 @@ package ccg;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
 
 public final class Game {
-
 	private JFrame frame;
-	private JButton easy, medium, hard;
+	private JButton easyLvl, mediumLvl, hardLvl;
 	private boolean run = false;
 
 	public static final int H = 21, W = 33;
 	public static Vertex[][] vertexMat = new Vertex[H][W];
 
+	/*
 	private final int[][] win = {
 			{ 0, 12 },
 			{ 1, 11 },
@@ -34,9 +26,9 @@ public final class Game {
 			{ 3, 11 },
 			{ 3, 13 },
 			{ 3, 15 }
-	};
-	private int tempX = 0, tempY = 0, activePlayer = 2, level, winner;
-	// public static GraphFacilities graph;
+	};*/
+	private int tempX = 0, tempY = 0, activePlayer = 2, depth, winner;
+
 	private int[][] logicMat = {
 			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
 			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
@@ -60,7 +52,7 @@ public final class Game {
 			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
 			{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 },
 	};
-	// private Point[][] coordMat;
+
 	private Point[] computerSoldiers = new Point[] {
 		new Point(16, 2),
 		new Point(15, 3),
@@ -87,9 +79,6 @@ private Point[] playerSoldiers = new Point[] {
 	new Point(16, 18)
 };
 
-	HashMap<Vertex, ArrayList<Vertex>> availableNodes = new HashMap<>();
-	// private int coordIndex;
-
 	public Game() {
 		for (int i = 0; i < logicMat.length; i++) {
 			for (int j = 0; j < logicMat[i].length; j++) {
@@ -107,38 +96,38 @@ private Point[] playerSoldiers = new Point[] {
 			}
 		}
 
-		tempX = tempY = level = 0;
+		tempX = tempY = depth = 1;
 		activePlayer = PlayerEnum.PLAYER; // Player stars first
 	}
 
 	public void gameStart() {
-		JPanel menuPanel = new JPanel();
-		easy = new JButton("Easy");
-		easy.setActionCommand("Easy");
-		easy.addActionListener(new OptionListener());
-		easy.setBounds(25, 20, 180, 95);
+		JPanel panel = new JPanel();
+		easyLvl = new JButton("Easy");
+		easyLvl.setActionCommand("Easy");
+		easyLvl.addActionListener(new OptionListener());
+		easyLvl.setBounds(25, 20, 180, 95);
 
-		medium = new JButton("Medium");
-		medium.setActionCommand("Medium");
-		medium.addActionListener(new OptionListener());
-		medium.setBounds(25, 130, 180, 95);
+		mediumLvl = new JButton("Medium");
+		mediumLvl.setActionCommand("Medium");
+		mediumLvl.addActionListener(new OptionListener());
+		mediumLvl.setBounds(25, 130, 180, 95);
 
-		hard = new JButton("Hard");
-		hard.setActionCommand("Hard");
-		hard.addActionListener(new OptionListener());
-		hard.setBounds(25, 240, 180, 95);
+		hardLvl = new JButton("Hard");
+		hardLvl.setActionCommand("Hard");
+		hardLvl.addActionListener(new OptionListener());
+		hardLvl.setBounds(25, 240, 180, 95);
 
-		menuPanel.setLayout(null);
-		menuPanel.setBounds(0, 0, 300, 450);
-		menuPanel.add(easy);
-		menuPanel.add(medium);
-		menuPanel.add(hard);
+		panel.setLayout(null);
+		panel.setBounds(0, 0, 300, 450);
+		panel.add(easyLvl);
+		panel.add(mediumLvl);
+		panel.add(hardLvl);
 
-		frame = new JFrame("Select Level: ");
-		frame.add(menuPanel);
+		frame = new JFrame("Select Level Difficulty: ");
+		frame.add(panel);
 		frame.setDefaultCloseOperation(3);
 		frame.setLocationRelativeTo(null);
-		frame.setSize(300, 430);
+		frame.setSize(315, 435);
 		frame.setLayout(null);
 		frame.setVisible(true);
 	}
@@ -148,18 +137,18 @@ private Point[] playerSoldiers = new Point[] {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand().equals("Easy")) {
-				level = 1;
+				depth = 1; //Game Level
 				run = true;
 				frame.dispose();
 
 			} else if (e.getActionCommand().equals("Medium")) {
-				level = 2;
+				depth = 2; //Game Level
 				run = true;
 				frame.dispose();
 			}
 
 			else {
-				level = 3;
+				depth = 3; //Game Level
 				run = true;
 				frame.dispose();
 			}
@@ -333,54 +322,6 @@ private Point[] playerSoldiers = new Point[] {
 		vertexMat[destY][destX].content = activePlayer;
 	}
 
-	void AIMove(int destX, int destY, int tempX, int tempY) {
-		vertexMat[tempY][tempX].content = PlayerEnum.NONE;
-		vertexMat[destY][destX].content = activePlayer;
-	}
-
-	public void AI(int level){
-		int max = 18, min = Integer.MAX_VALUE;
-		Point currentGoal, bestMove = new Point();
-		Vertex bestVertex = new Vertex(new Point());
-		Utility();
-		if (level == 1){
-			for(Map.Entry<Vertex, ArrayList<Vertex>> entry : availableNodes.entrySet()) {
-				for(Vertex move: entry.getValue()) {
-
-					for (int i = 0; i < playerSoldiers.length; i++) {
-						currentGoal = new Point(playerSoldiers[i].x, playerSoldiers[i].y);
-						if (currentGoal.y - move.getLocation().y < max){
-							System.out.println("Best move: " + move.getLocation());
-							max = currentGoal.y - move.getLocation().y;
-							bestMove = move.getLocation();
-							bestVertex = entry.getKey();
-						}
-					}
-				}
-			}
-			System.out.println("Best move: " + bestMove.getLocation());
-			AIMove(bestMove.x, bestMove.y, bestVertex.getLocation().x, bestVertex.getLocation().y);
-		}else if(level==2){
-
-		}else if(level==3){
-
-		}
-	}
-
-	public void Utility() {
-		
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if(vertexMat[i][j] != null &&
-				vertexMat[i][j].getContent() == PlayerEnum.COMPUTER &&
-				!findNextMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y).isEmpty()){
-					availableNodes.put(vertexMat[i][j], findNextMoves(vertexMat[i][j].getLocation().x, vertexMat[i][j].getLocation().y));
-					break;
-				}
-			}
-		}
-	}
-
 	public void call() {
 		int depth = 1;
 		Vertex[][] tempBoard = new Vertex[H][W];
@@ -395,36 +336,6 @@ private Point[] playerSoldiers = new Point[] {
 				 }
 			}
 		}
-
-		/* 
-		tempBoard[5][17].content = 0;
-
-		int counter = 0;
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if(vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
-							counter++;
-				}
-			}
-		}
-		System.out.println(counter);
-
-*/
-
-
-
-
-		/*
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if (vertexMat[i][j] == null)  {
-					tempBoard[i][j] = null;
-				} else {
-					tempBoard[i][j].setLocation(vertexMat[i][j].getLocation());
-					tempBoard[i][j].content = vertexMat[i][j].getContent();
-				}
-			}
-		}*/
 
 		//Current Computer Vertices
 		for (int i = 0; i < this.H; i++) {
