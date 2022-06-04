@@ -8,6 +8,7 @@ public class Vertex implements Cloneable {
 	private Point point;
 	private boolean visited;
 	public double score;
+	public boolean arrived = false;
 
 	public Vertex(Point l) {
 		this(l, 0);
@@ -38,6 +39,7 @@ public class Vertex implements Cloneable {
 	public void setVisited(boolean visited) {
 		this.visited = visited;
 	}
+
 
 	public Object clone() throws CloneNotSupportedException
     {

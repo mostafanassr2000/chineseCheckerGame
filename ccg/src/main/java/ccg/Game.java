@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.sound.midi.SysexMessage;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
@@ -381,7 +382,10 @@ private Point[] playerSoldiers = new Point[] {
 		}
 	}
 
+	double preBestScore = 0;
+
 	public void call() {
+		ArrayList<Double> scores = new ArrayList<Double>();
 		int depth = 1;
 		Vertex[][] tempBoard = new Vertex[H][W];
 		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
@@ -396,66 +400,59 @@ private Point[] playerSoldiers = new Point[] {
 			}
 		}
 
-		/* 
-		tempBoard[5][17].content = 0;
 
-		int counter = 0;
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if(vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
-							counter++;
-				}
-			}
-		}
-		System.out.println(counter);
-
-*/
-
-
-
-
-		/*
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if (vertexMat[i][j] == null)  {
-					tempBoard[i][j] = null;
-				} else {
-					tempBoard[i][j].setLocation(vertexMat[i][j].getLocation());
-					tempBoard[i][j].content = vertexMat[i][j].getContent();
-				}
-			}
-		}*/
 
 		//Current Computer Vertices
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
 				if (vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
+					
 					vertices.add(new Vertex(vertexMat[i][j].getLocation(), vertexMat[i][j].content));
+					/* 
+					if (countInsideSoldiers() > 5 ) {
+						//System.out.println("OUTSIDE SOLDIERS: " + countInsideSoldiers());
+						if (outSideSoldiers(vertexMat[i][j])) {	//if the soldier is outside
+							vertices.add(new Vertex(vertexMat[i][j].getLocation(), vertexMat[i][j].content));
+						}
+
+					} else {
+
+					}*/
+
 				}
 			}
 		}
 
 		Vertex goal = null;
+	
+		for(int i = playerSoldiers.length -1 ; i >= 0; i--) {
+            int x = (int) playerSoldiers[i].getX();
+            int y = (int) playerSoldiers[i].getY();
 
-		for(int i = 0; i < playerSoldiers.length; i++) {
-			int x = (int) playerSoldiers[i].getX();
-			int y = (int) playerSoldiers[i].getY();
-
-			if (this.vertexMat[y][x].content != 1) {	//Computer
-				goal = this.vertexMat[y][x];
-				break;
-			}
-		}
-
-
+            if (this.vertexMat[y][x].content != 1) {    //Computer
+                goal = this.vertexMat[y][x];
+                break;
+            }
+        }
+		
+		
 		Movement bestMove = null;
 		double bestScore = Double.MAX_VALUE;
+		
 
 		//Getting best score
 		for (Vertex currV: vertices) {
 			Movement vertexMove = minmax(depth, tempBoard, currV, goal);
-			if (vertexMove != null && vertexMove.score < bestScore) {
+
+			if (vertexMove != null && vertexMove.score < bestScore && !scores.contains(vertexMove.score)) {
 				bestScore = vertexMove.score;
+				scores.add(bestScore);
+				
+				System.out.println("ArrayList: ");
+				System.out.println(scores);
+				System.out.println("----------------------------");
+
+				preBestScore = bestScore;
 				bestMove = new Movement(currV.getLocation(), vertexMove.dest, bestScore);
 				System.out.println(bestScore);
 			}
@@ -465,6 +462,12 @@ private Point[] playerSoldiers = new Point[] {
 		tempY = (int) bestMove.src.getLocation().getY();
 
 		move((int) bestMove.dest.getLocation().getX(), (int) bestMove.dest.getLocation().getY());
+
+		//check if vertex has reached goal
+		if (bestMove.dest.getLocation() == goal.getLocation()) {
+			vertexMat[(int)bestMove.dest.getLocation().getY()][(int)bestMove.dest.getLocation().getX()].arrived = true;
+		}
+
 	}
 
 	public Movement minmax(int depth, Vertex copyBoard[][], Vertex vertex, Vertex goal) {
@@ -490,108 +493,10 @@ private Point[] playerSoldiers = new Point[] {
 				
 				bestMove = new Movement(vertex.getLocation(), bestPoint, bestScore);
 
-				//System.out.println("Score: " + bestScore);
-	/*
-				for (int i = 0; i < this.H; i++) {
-					for (int j = 0; j < this.W; j++) {
-						if ( newBoard[i][j] == null) {
-							tempBoard[i][j] = null;
-						}else {
-							tempBoard[i][j] = new Vertex(newBoard[i][j].getLocation(), newBoard[i][j].content);
-						 }
-					}
-				}*/
 			}
 		}
-
-
 
 		return bestMove;
- 		//double score = Her(vertices, goal);
-		
-/* 
-		//break;
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if (this.vertexMat[i][j] == null) {
-					System.out.print("9 ");
-				}
-				else if (this.vertexMat[i][j].content == 1) {
-					System.out.print("1 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 2) {
-					System.out.print("2 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 0) {
-					System.out.print("0 ");
-				}
-			}
-			System.out.println("");
-		}*/
-
-
-		 /*
-		for (Vertex vertix : vertices) {
-			possibleMoves = findNextMoves((int) vertix.getLocation().getX(), (int) vertix.getLocation().getY());
-
-			for (Vertex vertexMove : possibleMoves) {
-				Vertex newBoard[][] = new Vertex[H][W];
-				
-				newBoard = AIMove2((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY(), (int) vertix.getLocation().getX(), (int) vertix.getLocation().getY(), copyBoard);
-				//break;
-
-				
-				
-				if (Her(newBoard, goal) < score) {
-					score = Her(newBoard, goal);
-					System.out.println("Score: " + score);
-					for (int i = 0; i < this.H; i++) {
-						for (int j = 0; j < this.W; j++) {
-							tempBoard[i][j] = newBoard[i][j];
-						}
-					}
-				}
-
-				newBoard = null;
-			}
-	
-
-		
-
-			//all.addAll(0, possibleMoves);
-		}
-
-
-
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				this.vertexMat[i][j] = tempBoard[i][j];
-			}
-		}
-
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if (this.vertexMat[i][j] == null) {
-					System.out.print("9 ");
-				}
-				else if (this.vertexMat[i][j].content == 1) {
-					System.out.print("1 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 2) {
-					System.out.print("2 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 0) {
-					System.out.print("0 ");
-				}
-			}
-			System.out.println("");
-		}
-
-		return null;*/
 	}
 
 	Vertex[][] AIMove2(int destX, int destY, int srcX, int srcY, Vertex[][] copyBoard) {
@@ -630,9 +535,38 @@ private Point[] playerSoldiers = new Point[] {
 		int sum = 0;
 		for (Vertex vertix : vertices) {
 			sum += Math.sqrt(Math.pow(goal.getLocation().getX() - vertix.getLocation().getX(), 2) + Math.pow(goal.getLocation().getY() - vertix.getLocation().getY(), 2));
+
 		}
 
 		return sum ;
+	}
+
+	public boolean outSideSoldiers(Vertex v) {
+
+		for (int i = 0; i < playerSoldiers.length; i++) {
+			//int x = (int) v.getLocation().getX();
+			//int y = (int) v.getLocation().getY();
+
+			if (v.getLocation() == playerSoldiers[i]) {	//inside
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public int countInsideSoldiers() {
+		int count = 0;
+
+		for (int i = 0; i < playerSoldiers.length; i++) {
+			int x = (int) playerSoldiers[i].getLocation().getX();
+			int y = (int) playerSoldiers[i].getLocation().getY();
+
+			if (vertexMat[y][x].content == PlayerEnum.COMPUTER) {	
+				count++;
+			}
+		}
+		return count;
 	}
 
 
