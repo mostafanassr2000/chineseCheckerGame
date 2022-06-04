@@ -18,14 +18,3 @@
 
 
 
--Emails: 
-         1- ahmedmagdy3abdelfattah@gmail.com	
-	 
- 	 2- sandraiskanderr@gmail.com
-
-         3- mostafanassr200083@gmail.com	
-
-         4- islamsameh33@gmail.com
-
-         5- saifaly0016@gmail.com
-
