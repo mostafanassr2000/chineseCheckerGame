@@ -2,7 +2,7 @@ package ccg;
 
 import java.awt.Point;
 
-public class Vertex {
+public class Vertex implements Cloneable {
 
 	public int content;
 	private Point point;
@@ -17,6 +17,10 @@ public class Vertex {
 		this.point = point;
 		this.content = content;
 		this.visited = false;
+	}
+
+	public void setLocation(Point point) {
+		this.point = point;
 	}
 
 	public Point getLocation() {
@@ -34,6 +38,11 @@ public class Vertex {
 	public void setVisited(boolean visited) {
 		this.visited = visited;
 	}
+
+	public Object clone() throws CloneNotSupportedException
+    {
+        return super.clone();
+    }
 
 
 

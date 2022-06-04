@@ -199,12 +199,17 @@ public class GUI extends JFrame implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run()  {
         while (game.getPlayer() != PlayerEnum.NONE) {
 
             if (game.getPlayer() == PlayerEnum.COMPUTER) {
                 //game.AI(1);
+            
+
                 game.call();
+         
+
+
                 updateGame();
                 game.switchTurn(game.getPlayer());
             }

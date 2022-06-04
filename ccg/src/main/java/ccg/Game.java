@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
 
 public final class Game {
 
@@ -185,32 +186,32 @@ private Point[] playerSoldiers = new Point[] {
 		Vertex bottomLeft = vertexMat[y + 1][x - 1];
 
 		if (topRight != null && topRight.content == 0) {
-			System.out.println("topRight: " + topRight.getLocation());
+			//System.out.println("topRight: " + topRight.getLocation());
 			availableVertices.add(topRight);
 		}
 
 		if (topLeft != null && topLeft.content == 0) {
-			System.out.println("topLeft: " + topLeft.getLocation());
+			//System.out.println("topLeft: " + topLeft.getLocation());
 			availableVertices.add(topLeft);
 		}
 
 		if (right != null && right.content == 0) {
-			System.out.println("right: " + right.getLocation());
+			//System.out.println("right: " + right.getLocation());
 			availableVertices.add(right);
 		}
 
 		if (left != null && left.content == 0) {
-			System.out.println("left: " + left.getLocation());
+			//System.out.println("left: " + left.getLocation());
 			availableVertices.add(left);
 		}
 
 		if (bottomRight != null && bottomRight.content == 0) {
-			System.out.println("bottomRight: " + bottomRight.getLocation());
+			//System.out.println("bottomRight: " + bottomRight.getLocation());
 			availableVertices.add(bottomRight);
 		}
 
 		if (bottomLeft != null && bottomLeft.content == 0) {
-			System.out.println("bottomLeft: " + bottomLeft.getLocation());
+			//System.out.println("bottomLeft: " + bottomLeft.getLocation());
 			availableVertices.add(bottomLeft);
 		}
 
@@ -235,7 +236,7 @@ private Point[] playerSoldiers = new Point[] {
 		if (topRight != null && JTopRight != null && topRight.content != 0 && JTopRight.content == 0
 				&& !JTopRight.isVisited()) {
 			vertexMat[y - 2][x + 2].setVisited(true);
-			System.out.println("topRight: " + topRight.getLocation());
+			//System.out.println("topRight: " + topRight.getLocation());
 			availableVertices.add(JTopRight);
 			availableVertices = jump(availableVertices, JTopRight.getLocation().x, JTopRight.getLocation().y);
 		}
@@ -243,21 +244,21 @@ private Point[] playerSoldiers = new Point[] {
 		if (topLeft != null && JTopLeft != null && topLeft.content != 0 && JTopLeft.content == 0
 				&& !JTopLeft.isVisited()) {
 			vertexMat[y - 2][x - 2].setVisited(true);
-			System.out.println("topLeft: " + topLeft.getLocation());
+			//System.out.println("topLeft: " + topLeft.getLocation());
 			availableVertices.add(JTopLeft);
 			availableVertices = jump(availableVertices, JTopLeft.getLocation().x, JTopLeft.getLocation().y);
 		}
 
 		if (right != null && JRight != null && right.content != 0 && JRight.content == 0 && !JRight.isVisited()) {
 			vertexMat[y][x + 4].setVisited(true);
-			System.out.println("right: " + right.getLocation());
+			//System.out.println("right: " + right.getLocation());
 			availableVertices.add(JRight);
 			availableVertices = jump(availableVertices, JRight.getLocation().x, JRight.getLocation().y);
 		}
 
 		if (left != null && JLeft != null && left.content != 0 && JLeft.content == 0 && !JLeft.isVisited()) {
 			vertexMat[y][x - 4].setVisited(true);
-			System.out.println("left: " + left.getLocation());
+			//System.out.println("left: " + left.getLocation());
 			availableVertices.add(JLeft);
 			availableVertices = jump(availableVertices, JLeft.getLocation().x, JLeft.getLocation().y);
 		}
@@ -265,7 +266,7 @@ private Point[] playerSoldiers = new Point[] {
 		if (bottomRight != null && JBottomRight != null && bottomRight.content != 0 && JBottomRight.content == 0
 				&& !JBottomRight.isVisited()) {
 			vertexMat[y + 2][x + 2].setVisited(true);
-			System.out.println("bottomRight: " + bottomRight.getLocation());
+			//System.out.println("bottomRight: " + bottomRight.getLocation());
 			availableVertices.add(JBottomRight);
 			availableVertices = jump(availableVertices, JBottomRight.getLocation().x, JBottomRight.getLocation().y);
 		}
@@ -273,7 +274,7 @@ private Point[] playerSoldiers = new Point[] {
 		if (bottomLeft != null && JBottomLeft != null && bottomLeft.content != 0 && JBottomLeft.content == 0
 				&& !JBottomLeft.isVisited()) {
 			vertexMat[y + 2][x - 2].setVisited(true);
-			System.out.println("bottomLeft: " + bottomLeft.getLocation());
+			//System.out.println("bottomLeft: " + bottomLeft.getLocation());
 			availableVertices.add(JBottomLeft);
 			availableVertices = jump(availableVertices, JBottomLeft.getLocation().x, JBottomLeft.getLocation().y);
 		}
@@ -387,18 +388,51 @@ private Point[] playerSoldiers = new Point[] {
 
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
-				tempBoard[i][j] = vertexMat[i][j];
+				if ( vertexMat[i][j] == null) {
+					tempBoard[i][j] = null;
+				}else {
+					tempBoard[i][j] = new Vertex(vertexMat[i][j].getLocation(), vertexMat[i][j].content);
+				 }
 			}
 		}
 
+		/* 
+		tempBoard[5][17].content = 0;
+
+		int counter = 0;
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if(vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
+							counter++;
+				}
+			}
+		}
+		System.out.println(counter);
+
+*/
+
+
+
+
+		/*
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if (vertexMat[i][j] == null)  {
+					tempBoard[i][j] = null;
+				} else {
+					tempBoard[i][j].setLocation(vertexMat[i][j].getLocation());
+					tempBoard[i][j].content = vertexMat[i][j].getContent();
+				}
+			}
+		}*/
+
+		//Current Computer Vertices
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
 				if (vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
-					vertices.add(vertexMat[i][j]);
+					vertices.add(new Vertex(vertexMat[i][j].getLocation(), vertexMat[i][j].content));
 				}
 			}
-
-
 		}
 
 		Vertex goal = null;
@@ -414,20 +448,91 @@ private Point[] playerSoldiers = new Point[] {
 		}
 
 
-		minmax(depth, tempBoard, vertices, goal);
+		Movement bestMove = null;
+		double bestScore = Double.MAX_VALUE;
+
+		//Getting best score
+		for (Vertex currV: vertices) {
+			Movement vertexMove = minmax(depth, tempBoard, currV, goal);
+			if (vertexMove != null && vertexMove.score < bestScore) {
+				bestScore = vertexMove.score;
+				bestMove = new Movement(currV.getLocation(), vertexMove.dest, bestScore);
+				System.out.println(bestScore);
+			}
+		}
+	
+		tempX = (int) bestMove.src.getLocation().getX();
+		tempY = (int) bestMove.src.getLocation().getY();
+
+		move((int) bestMove.dest.getLocation().getX(), (int) bestMove.dest.getLocation().getY());
 	}
 
-	public Vertex minmax(int depth, Vertex copyBoard[][], ArrayList<Vertex> vertices, Vertex goal) {
+	public Movement minmax(int depth, Vertex copyBoard[][], Vertex vertex, Vertex goal) {
 
-		ArrayList<Vertex> possibleMoves;
+		ArrayList<Vertex> possibleMoves = findNextMoves((int) vertex.getLocation().getX(), (int) vertex.getLocation().getY());
 		ArrayList<Vertex> all = new ArrayList<Vertex>();
 		Vertex tempBoard[][] =  new Vertex[H][W];
 		
-		double score = Double.MAX_VALUE;
+		double bestScore = Double.MAX_VALUE;
+		Point bestPoint = null;
+		Movement bestMove = null;
 		double tmpScore;
 
+		for (Vertex vertexMove : possibleMoves) {
+			Vertex newBoard[][] = new Vertex[H][W];
+			
+			newBoard = AIMove2((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY(), (int) vertex.getLocation().getX(), (int) vertex.getLocation().getY(), copyBoard);
+	
+			if (Her(newBoard, goal) < bestScore) {
+				bestScore = Her(newBoard, goal);
+						
+				bestPoint = new Point((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY());
+				
+				bestMove = new Movement(vertex.getLocation(), bestPoint, bestScore);
+
+				//System.out.println("Score: " + bestScore);
+	/*
+				for (int i = 0; i < this.H; i++) {
+					for (int j = 0; j < this.W; j++) {
+						if ( newBoard[i][j] == null) {
+							tempBoard[i][j] = null;
+						}else {
+							tempBoard[i][j] = new Vertex(newBoard[i][j].getLocation(), newBoard[i][j].content);
+						 }
+					}
+				}*/
+			}
+		}
+
+
+
+		return bestMove;
  		//double score = Her(vertices, goal);
 		
+/* 
+		//break;
+		for (int i = 0; i < this.H; i++) {
+			for (int j = 0; j < this.W; j++) {
+				if (this.vertexMat[i][j] == null) {
+					System.out.print("9 ");
+				}
+				else if (this.vertexMat[i][j].content == 1) {
+					System.out.print("1 ");
+				}
+
+				else if (this.vertexMat[i][j].content == 2) {
+					System.out.print("2 ");
+				}
+
+				else if (this.vertexMat[i][j].content == 0) {
+					System.out.print("0 ");
+				}
+			}
+			System.out.println("");
+		}*/
+
+
+		 /*
 		for (Vertex vertix : vertices) {
 			possibleMoves = findNextMoves((int) vertix.getLocation().getX(), (int) vertix.getLocation().getY());
 
@@ -451,10 +556,7 @@ private Point[] playerSoldiers = new Point[] {
 
 				newBoard = null;
 			}
-			/* 
-			if (possibleMoves.size() != 0) {
-				break;
-			}*/
+	
 
 		
 
@@ -489,19 +591,23 @@ private Point[] playerSoldiers = new Point[] {
 			System.out.println("");
 		}
 
-		return null;
+		return null;*/
 	}
 
-	Vertex[][] AIMove2(int destX, int destY, int srcX, int srcY, Vertex[][] vertexMat) {
+	Vertex[][] AIMove2(int destX, int destY, int srcX, int srcY, Vertex[][] copyBoard) {
 
 		Vertex[][] tempBoard = new Vertex[H][W];
 
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
-				tempBoard[i][j] = vertexMat[i][j];
+				if (copyBoard[i][j] == null) {
+					tempBoard[i][j] = null;
+				}else {
+					tempBoard[i][j] = new Vertex(copyBoard[i][j].getLocation(), copyBoard[i][j].content);
+				 }
 			}
 		}
-
+		
 		tempBoard[srcY][srcX].content = PlayerEnum.NONE;
 		tempBoard[destY][destX].content = PlayerEnum.COMPUTER;
 
@@ -515,8 +621,8 @@ private Point[] playerSoldiers = new Point[] {
 
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
-				if (vertexMat[i][j] != null && vertexMat[i][j].content == 1) {
-					vertices.add(copyBoard[i][j]);
+				if (copyBoard[i][j] != null && copyBoard[i][j].content == PlayerEnum.COMPUTER) {
+					vertices.add(new Vertex(copyBoard[i][j].getLocation(), copyBoard[i][j].content));
 				}
 			}
 		}
@@ -526,7 +632,7 @@ private Point[] playerSoldiers = new Point[] {
 			sum += Math.sqrt(Math.pow(goal.getLocation().getX() - vertix.getLocation().getX(), 2) + Math.pow(goal.getLocation().getY() - vertix.getLocation().getY(), 2));
 		}
 
-		return sum;
+		return sum ;
 	}
 
 
