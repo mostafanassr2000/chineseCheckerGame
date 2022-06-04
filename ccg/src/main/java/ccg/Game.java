@@ -14,19 +14,6 @@ public final class Game {
 	public static final int H = 21, W = 33;
 	public static Vertex[][] vertexMat = new Vertex[H][W];
 
-	/*
-	private final int[][] win = {
-			{ 0, 12 },
-			{ 1, 11 },
-			{ 1, 13 },
-			{ 2, 10 },
-			{ 2, 12 },
-			{ 2, 14 },
-			{ 3, 9 },
-			{ 3, 11 },
-			{ 3, 13 },
-			{ 3, 15 }
-	};*/
 	private int tempX = 0, tempY = 0, activePlayer = 2, depth, winner;
 
 	private int[][] logicMat = {
@@ -158,7 +145,7 @@ private Point[] playerSoldiers = new Point[] {
 	// Getting all possible next moves
 	public ArrayList<Vertex> findNextMoves(int x, int y) {
 		ArrayList<Vertex> availableVertices = availableMoves(x, y);
-		reset();
+		makeVisitedFalse();
 		return availableVertices;
 	}
 
@@ -175,39 +162,39 @@ private Point[] playerSoldiers = new Point[] {
 		Vertex bottomLeft = vertexMat[y + 1][x - 1];
 
 		if (topRight != null && topRight.content == 0) {
-			//System.out.println("topRight: " + topRight.getLocation());
+			
 			availableVertices.add(topRight);
 		}
 
 		if (topLeft != null && topLeft.content == 0) {
-			//System.out.println("topLeft: " + topLeft.getLocation());
+			
 			availableVertices.add(topLeft);
 		}
 
 		if (right != null && right.content == 0) {
-			//System.out.println("right: " + right.getLocation());
+			
 			availableVertices.add(right);
 		}
 
 		if (left != null && left.content == 0) {
-			//System.out.println("left: " + left.getLocation());
+			
 			availableVertices.add(left);
 		}
 
 		if (bottomRight != null && bottomRight.content == 0) {
-			//System.out.println("bottomRight: " + bottomRight.getLocation());
+			
 			availableVertices.add(bottomRight);
 		}
 
 		if (bottomLeft != null && bottomLeft.content == 0) {
-			//System.out.println("bottomLeft: " + bottomLeft.getLocation());
+			
 			availableVertices.add(bottomLeft);
 		}
 
-		return jump(availableVertices, x, y);
+		return hop(availableVertices, x, y);
 	}
 
-	ArrayList<Vertex> jump(ArrayList<Vertex> availableVertices, int x, int y) {
+	ArrayList<Vertex> hop(ArrayList<Vertex> availableVertices, int x, int y) {
 		Vertex JTopRight = vertexMat[y - 2][x + 2];
 		Vertex JTopLeft = vertexMat[y - 2][x - 2];
 		Vertex JRight = vertexMat[y][x + 4];
@@ -225,55 +212,48 @@ private Point[] playerSoldiers = new Point[] {
 		if (topRight != null && JTopRight != null && topRight.content != 0 && JTopRight.content == 0
 				&& !JTopRight.isVisited()) {
 			vertexMat[y - 2][x + 2].setVisited(true);
-			//System.out.println("topRight: " + topRight.getLocation());
 			availableVertices.add(JTopRight);
-			availableVertices = jump(availableVertices, JTopRight.getLocation().x, JTopRight.getLocation().y);
+			availableVertices = hop(availableVertices, JTopRight.getLocation().x, JTopRight.getLocation().y);
 		}
 
 		if (topLeft != null && JTopLeft != null && topLeft.content != 0 && JTopLeft.content == 0
 				&& !JTopLeft.isVisited()) {
 			vertexMat[y - 2][x - 2].setVisited(true);
-			//System.out.println("topLeft: " + topLeft.getLocation());
 			availableVertices.add(JTopLeft);
-			availableVertices = jump(availableVertices, JTopLeft.getLocation().x, JTopLeft.getLocation().y);
+			availableVertices = hop(availableVertices, JTopLeft.getLocation().x, JTopLeft.getLocation().y);
 		}
 
 		if (right != null && JRight != null && right.content != 0 && JRight.content == 0 && !JRight.isVisited()) {
 			vertexMat[y][x + 4].setVisited(true);
-			//System.out.println("right: " + right.getLocation());
 			availableVertices.add(JRight);
-			availableVertices = jump(availableVertices, JRight.getLocation().x, JRight.getLocation().y);
+			availableVertices = hop(availableVertices, JRight.getLocation().x, JRight.getLocation().y);
 		}
 
 		if (left != null && JLeft != null && left.content != 0 && JLeft.content == 0 && !JLeft.isVisited()) {
 			vertexMat[y][x - 4].setVisited(true);
-			//System.out.println("left: " + left.getLocation());
 			availableVertices.add(JLeft);
-			availableVertices = jump(availableVertices, JLeft.getLocation().x, JLeft.getLocation().y);
+			availableVertices = hop(availableVertices, JLeft.getLocation().x, JLeft.getLocation().y);
 		}
 
 		if (bottomRight != null && JBottomRight != null && bottomRight.content != 0 && JBottomRight.content == 0
 				&& !JBottomRight.isVisited()) {
 			vertexMat[y + 2][x + 2].setVisited(true);
-			//System.out.println("bottomRight: " + bottomRight.getLocation());
 			availableVertices.add(JBottomRight);
-			availableVertices = jump(availableVertices, JBottomRight.getLocation().x, JBottomRight.getLocation().y);
+			availableVertices = hop(availableVertices, JBottomRight.getLocation().x, JBottomRight.getLocation().y);
 		}
 
 		if (bottomLeft != null && JBottomLeft != null && bottomLeft.content != 0 && JBottomLeft.content == 0
 				&& !JBottomLeft.isVisited()) {
 			vertexMat[y + 2][x - 2].setVisited(true);
-			//System.out.println("bottomLeft: " + bottomLeft.getLocation());
 			availableVertices.add(JBottomLeft);
-			availableVertices = jump(availableVertices, JBottomLeft.getLocation().x, JBottomLeft.getLocation().y);
+			availableVertices = hop(availableVertices, JBottomLeft.getLocation().x, JBottomLeft.getLocation().y);
 		}
 
-		
 
 		return availableVertices;
 	}
 
-	public void reset() {
+	public void makeVisitedFalse() {
 		for (int i = 0; i < this.H; i++) {
 			for (int j = 0; j < this.W; j++) {
 				if (vertexMat[i][j] != null && vertexMat[i][j].isVisited()) {
@@ -322,7 +302,7 @@ private Point[] playerSoldiers = new Point[] {
 		vertexMat[destY][destX].content = activePlayer;
 	}
 
-	public void call() {
+	public void callAI() {
 		int depth = 1;
 		Vertex[][] tempBoard = new Vertex[H][W];
 		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
@@ -364,7 +344,7 @@ private Point[] playerSoldiers = new Point[] {
 
 		//Getting best score
 		for (Vertex currV: vertices) {
-			Movement vertexMove = minmax(depth, tempBoard, currV, goal);
+			Movement vertexMove = minmax(depth, tempBoard, currV, goal, true);
 			if (vertexMove != null && vertexMove.score < bestScore) {
 				bestScore = vertexMove.score;
 				bestMove = new Movement(currV.getLocation(), vertexMove.dest, bestScore);
@@ -378,134 +358,54 @@ private Point[] playerSoldiers = new Point[] {
 		move((int) bestMove.dest.getLocation().getX(), (int) bestMove.dest.getLocation().getY());
 	}
 
-	public Movement minmax(int depth, Vertex copyBoard[][], Vertex vertex, Vertex goal) {
+	public Movement minmax(int depth, Vertex copyBoard[][], Vertex vertex, Vertex goal , boolean isMaximizing) {
+		ArrayList<Vertex> possibleMoves = findNextMoves((int) vertex.getLocation().getX(),
+				(int) vertex.getLocation().getY());
 
-		ArrayList<Vertex> possibleMoves = findNextMoves((int) vertex.getLocation().getX(), (int) vertex.getLocation().getY());
-		ArrayList<Vertex> all = new ArrayList<Vertex>();
-		Vertex tempBoard[][] =  new Vertex[H][W];
-		
-		double bestScore = Double.MAX_VALUE;
-		Point bestPoint = null;
-		Movement bestMove = null;
-		double tmpScore;
-
-		for (Vertex vertexMove : possibleMoves) {
-			Vertex newBoard[][] = new Vertex[H][W];
-			
-			newBoard = AIMove2((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY(), (int) vertex.getLocation().getX(), (int) vertex.getLocation().getY(), copyBoard);
 	
-			if (Her(newBoard, goal) < bestScore) {
-				bestScore = Her(newBoard, goal);
-						
-				bestPoint = new Point((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY());
-				
-				bestMove = new Movement(vertex.getLocation(), bestPoint, bestScore);
-
-				//System.out.println("Score: " + bestScore);
-	/*
-				for (int i = 0; i < this.H; i++) {
-					for (int j = 0; j < this.W; j++) {
-						if ( newBoard[i][j] == null) {
-							tempBoard[i][j] = null;
-						}else {
-							tempBoard[i][j] = new Vertex(newBoard[i][j].getLocation(), newBoard[i][j].content);
-						 }
-					}
-				}*/
-			}
-		}
-
-
-
-		return bestMove;
- 		//double score = Her(vertices, goal);
+		Point bestPoint = null;
+		Movement bestMove = null, baseBestMove = null;
 		
-/* 
-		//break;
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if (this.vertexMat[i][j] == null) {
-					System.out.print("9 ");
-				}
-				else if (this.vertexMat[i][j].content == 1) {
-					System.out.print("1 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 2) {
-					System.out.print("2 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 0) {
-					System.out.print("0 ");
-				}
-			}
-			System.out.println("");
-		}*/
-
-
-		 /*
-		for (Vertex vertix : vertices) {
-			possibleMoves = findNextMoves((int) vertix.getLocation().getX(), (int) vertix.getLocation().getY());
+		if (isMaximizing) {
+			
+			double bestScore = Double.MAX_VALUE;
 
 			for (Vertex vertexMove : possibleMoves) {
+				
 				Vertex newBoard[][] = new Vertex[H][W];
 				
-				newBoard = AIMove2((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY(), (int) vertix.getLocation().getX(), (int) vertix.getLocation().getY(), copyBoard);
-				//break;
+				newBoard = simulateMove((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY(),
+						(int) vertex.getLocation().getX(), (int) vertex.getLocation().getY(), copyBoard);
+				if (heuristicFun(newBoard, goal) < bestScore) {
+					
+					bestScore = heuristicFun(newBoard, goal);
+					
+					bestPoint = new Point((int) vertexMove.getLocation().getX(), (int) vertexMove.getLocation().getY());
 
-				
-				
-				if (Her(newBoard, goal) < score) {
-					score = Her(newBoard, goal);
-					System.out.println("Score: " + score);
-					for (int i = 0; i < this.H; i++) {
-						for (int j = 0; j < this.W; j++) {
-							tempBoard[i][j] = newBoard[i][j];
-						}
-					}
+					baseBestMove = new Movement(vertex.getLocation(), bestPoint, bestScore);
+
 				}
-
-				newBoard = null;
 			}
-	
+			if(depth > 1 && !findNextMoves(copyBoard[bestPoint.y][bestPoint.x].getLocation().x, copyBoard[bestPoint.y][bestPoint.x].getLocation().y).isEmpty()){
+				System.out.println("Recursion: "+ depth);
+				bestMove = minmax(depth-1, copyBoard, copyBoard[baseBestMove.src.y][baseBestMove.src.x], goal, true);
+			}
+			else{
+				System.out.println("Recursion return: "+ depth);
+				return baseBestMove;
+			}
+			
+		}
+		else{
+			
+		}
 
+		return bestMove;
 		
 
-			//all.addAll(0, possibleMoves);
-		}
-
-
-
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				this.vertexMat[i][j] = tempBoard[i][j];
-			}
-		}
-
-		for (int i = 0; i < this.H; i++) {
-			for (int j = 0; j < this.W; j++) {
-				if (this.vertexMat[i][j] == null) {
-					System.out.print("9 ");
-				}
-				else if (this.vertexMat[i][j].content == 1) {
-					System.out.print("1 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 2) {
-					System.out.print("2 ");
-				}
-
-				else if (this.vertexMat[i][j].content == 0) {
-					System.out.print("0 ");
-				}
-			}
-			System.out.println("");
-		}
-
-		return null;*/
 	}
 
-	Vertex[][] AIMove2(int destX, int destY, int srcX, int srcY, Vertex[][] copyBoard) {
+	Vertex[][] simulateMove(int destX, int destY, int srcX, int srcY, Vertex[][] copyBoard) {
 
 		Vertex[][] tempBoard = new Vertex[H][W];
 
@@ -526,7 +426,7 @@ private Point[] playerSoldiers = new Point[] {
 	}
 
 
-	public double Her(Vertex copyBoard[][], Vertex goal) {
+	public double heuristicFun(Vertex copyBoard[][], Vertex goal) {
 
 		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
 
@@ -545,10 +445,6 @@ private Point[] playerSoldiers = new Point[] {
 
 		return sum ;
 	}
-
-
-
-
 
 
 	// Setters and Getters
@@ -579,390 +475,4 @@ private Point[] playerSoldiers = new Point[] {
 	public void setTempX(int x) {
 		tempX = x;
 	}
-
-	/*
-	 * 
-	 * 
-	 * public boolean win() {
-	 * boolean p1 = true, p2 = true;
-	 * for (int i = 0; i < 10 && (p1 || p2); i++) {
-	 * p1 = (GraphFacilities.vertexMat[win[i][0]][win[i][1]].content
-	 * == PlayerEnum.HUMAN_PLAYER && p1);
-	 * p2 = (GraphFacilities.vertexMat[(H - 1) - win[i][0]][win[i][1]].content
-	 * == PlayerEnum.CPU_PLAYER && p2);
-	 * }
-	 * if (p1) {
-	 * if (status == 2) {
-	 * JOptionPane.showConfirmDialog(null,
-	 * "Blue Player Won!",
-	 * "Winner",
-	 * JOptionPane.CLOSED_OPTION,
-	 * JOptionPane.INFORMATION_MESSAGE);
-	 * } else {
-	 * JOptionPane.showConfirmDialog(null,
-	 * "You Won!",
-	 * "Winner",
-	 * JOptionPane.CLOSED_OPTION,
-	 * JOptionPane.INFORMATION_MESSAGE);
-	 * }
-	 * player = PlayerEnum.NONE;
-	 * return true;
-	 * } else if (p2) {
-	 * if (status == 2) {
-	 * JOptionPane.showConfirmDialog(null,
-	 * "Red Player Won!",
-	 * "Winner",
-	 * JOptionPane.CLOSED_OPTION,
-	 * JOptionPane.INFORMATION_MESSAGE);
-	 * } else {
-	 * JOptionPane.showConfirmDialog(null,
-	 * "The Computer Won!",
-	 * "Winner",
-	 * JOptionPane.CLOSED_OPTION,
-	 * JOptionPane.INFORMATION_MESSAGE);
-	 * }
-	 * player = PlayerEnum.NONE;
-	 * return true;
-	 * }
-	 * return false;
-	 * }
-	 * 
-	 * public void Move(int y, int x) {
-	 * System.out.println("Player "+this.getPlayer()+": ("+this.getTx()+", "+this.
-	 * getTy()+") To ("+x+", "+y+")");
-	 * GraphFacilities.vertexMat[y][x].content = player;
-	 * GraphFacilities.vertexMat[ty][tx].content = 99;
-	 * }
-	 * 
-	 * public void resetBoard() {
-	 * for (int i = 0; i < H; i++) {
-	 * for (int j = 0; j < W; j++) {
-	 * if (GraphFacilities.vertexMat[i][j] != null
-	 * && GraphFacilities.vertexMat[i][j].content > 9) {
-	 * GraphFacilities.vertexMat[i][j].content = PlayerEnum.NONE;
-	 * }
-	 * }
-	 * }
-	 * GraphFacilities.updateGraph(coordMat);
-	 * }
-	 * 
-	 * public void endTurn() {
-	 * resetBoard();
-	 * if (!win()) {
-	 * player = (player == PlayerEnum.CPU_PLAYER)
-	 * ? PlayerEnum.HUMAN_PLAYER
-	 * : PlayerEnum.CPU_PLAYER;
-	 * ty = 0;
-	 * tx = 0;
-	 * }
-	 * }
-	 * 
-	 * 
-	 * 
-	 * // only search for jumps
-	 * public Set<Point> optinalPlaysLen3(int x, int y) {
-	 * Set<Point> endPoints = new HashSet<>();
-	 * Set<CCEdge> edges
-	 * = GraphFacilities.g.outgoingEdgesOf(GraphFacilities.vertexMat[y][x]);
-	 * Iterator<CCEdge> it = edges.iterator();
-	 * while (it.hasNext()) {
-	 * CCEdge edge = it.next();
-	 * // Source isn't the origin.
-	 * if (!edge.getSrcVertx().getLocation().equals(new Point(x, y))) {
-	 * // Cell empty
-	 * if (edge.getSrcVertx().content == PlayerEnum.NONE) {
-	 * if (edge.getSrcVertx().getLocation().y - 2
-	 * == edge.getDestVertx().getLocation().y
-	 * || edge.getSrcVertx().getLocation().y + 2
-	 * == edge.getDestVertx().getLocation().y
-	 * || edge.getSrcVertx().getLocation().x - 4
-	 * == edge.getDestVertx().getLocation().x
-	 * || edge.getSrcVertx().getLocation().x + 4
-	 * == edge.getDestVertx().getLocation().x) {
-	 * if (player == PlayerEnum.HUMAN_PLAYER) {
-	 * edge.getSrcVertx().content
-	 * = PlayerEnum.POSSIBLE_HUMAN_TARGET;
-	 * } else {
-	 * edge.getSrcVertx().content
-	 * = PlayerEnum.POSSIBLE_CPU_TARGET;
-	 * }
-	 * endPoints.add(edge.getSrcVertx().getLocation());
-	 * endPoints.addAll(
-	 * optinalPlaysLen3(edge.getSrcVertx().getLocation().x,
-	 * edge.getSrcVertx().getLocation().y));
-	 * }
-	 * }
-	 * } else {
-	 * // Cell empty
-	 * if (edge.getDestVertx().content == PlayerEnum.NONE) {
-	 * if (edge.getSrcVertx().getLocation().y - 2
-	 * == edge.getDestVertx().getLocation().y
-	 * || edge.getSrcVertx().getLocation().y + 2
-	 * == edge.getDestVertx().getLocation().y
-	 * || edge.getSrcVertx().getLocation().x - 4
-	 * == edge.getDestVertx().getLocation().x
-	 * || edge.getSrcVertx().getLocation().x + 4
-	 * == edge.getDestVertx().getLocation().x) {
-	 * if (player == PlayerEnum.HUMAN_PLAYER) {
-	 * edge.getDestVertx().content
-	 * = PlayerEnum.POSSIBLE_HUMAN_TARGET;
-	 * } else {
-	 * edge.getDestVertx().content
-	 * = PlayerEnum.POSSIBLE_CPU_TARGET;
-	 * }
-	 * endPoints.add(edge.getDestVertx().getLocation());
-	 * endPoints.addAll(
-	 * optinalPlaysLen3(edge.getDestVertx().getLocation().x,
-	 * edge.getDestVertx().getLocation().y));
-	 * }
-	 * }
-	 * }
-	 * }
-	 * return endPoints;
-	 * }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * public int getStatus() {
-	 * return status;
-	 * }
-	 * 
-	 * public void setStatus(int value) {
-	 * if (status == 0) {
-	 * if (value == 1 || value == 2) {
-	 * status = value;
-	 * }
-	 * }
-	 * }
-	 * 
-	 * public void AI() {
-	 * int i;
-	 * // If only one player is outside
-	 * if (countOutsideSoldiers() == 1) {
-	 * CellVertex dest = null;
-	 * for (i = 0; i < cpuSoldiers.length; i++) {
-	 * if (cpuSoldiers[i].y < 13) {
-	 * for (int h = 13; h < GraphFacilities.H; h++) {
-	 * for (int j = 9 + (h - 13); j < 16 - (h - 13); j += 2) {
-	 * if (GraphFacilities.vertexMat[h][j].content
-	 * == PlayerEnum.NONE) {
-	 * dest = GraphFacilities.vertexMat[h][j];
-	 * }
-	 * }
-	 * }
-	 * List<CellVertex> path = GraphFacilities.findShortestPathLength(
-	 * GraphFacilities.vertexMat[cpuSoldiers[i].y][cpuSoldiers[i].x],
-	 * dest).getVertexList();
-	 * setTx(path.get(0).getLocation().x);
-	 * setTy(path.get(0).getLocation().y);
-	 * Move(path.get(1).getLocation().y, path.get(1).getLocation().x);
-	 * cpuSoldiers[i].setLocation(path.get(1).getLocation());
-	 * return;
-	 * }
-	 * }
-	 * }
-	 * // If there's an S turn available
-	 * if ((i = findCpuPlayerIndex(is_S_TurnExist())) > -1) {
-	 * setTx(cpuSoldiers[i].x);
-	 * setTy(cpuSoldiers[i].y);
-	 * Move(cpuSoldiers[i].y + 4, cpuSoldiers[i].x);
-	 * cpuSoldiers[i].y += 4;
-	 * } else {
-	 * if (cpuSoldiers[6].getLocation().equals(new Point(9, 3))
-	 * && GraphFacilities.vertexMat[4][10].content
-	 * != PlayerEnum.HUMAN_PLAYER
-	 * && GraphFacilities.vertexMat[4][10].content
-	 * != PlayerEnum.CPU_PLAYER) {
-	 * setTx(9);
-	 * setTy(3);
-	 * Move(4, 10);
-	 * cpuSoldiers[6].setLocation(10, 4);
-	 * } else if (cpuSoldiers[9].getLocation().equals(new Point(15, 3))
-	 * && GraphFacilities.vertexMat[4][14].content
-	 * != PlayerEnum.HUMAN_PLAYER
-	 * && GraphFacilities.vertexMat[4][14].content
-	 * != PlayerEnum.CPU_PLAYER) {
-	 * setTx(15);
-	 * setTy(3);
-	 * Move(4, 14);
-	 * cpuSoldiers[9].setLocation(14, 4);
-	 * } else {
-	 * CCEdge jump = findFarthestJump();
-	 * if (jump != null) {
-	 * setTx(jump.getSrcVertx().getLocation().x);
-	 * setTy(jump.getSrcVertx().getLocation().y);
-	 * Move(jump.getDestVertx().getLocation().y,
-	 * jump.getDestVertx().getLocation().x);
-	 * cpuSoldiers[findCpuPlayerIndex(
-	 * jump.getSrcVertx().getLocation())].setLocation(
-	 * jump.getDestVertx().getLocation());
-	 * } else {
-	 * for (i = 0; i < GraphFacilities.H; i++) {
-	 * for (int j = 0; j < GraphFacilities.W; j++) {
-	 * if (GraphFacilities.vertexMat[i][j] != null
-	 * && GraphFacilities.vertexMat[i][j].content
-	 * == PlayerEnum.CPU_PLAYER) {
-	 * setTx(j);
-	 * setTy(i);
-	 * resetBoard();
-	 * Set<Point> points = optinalPlays(tx, ty);
-	 * Iterator<Point> it = points.iterator();
-	 * while (it.hasNext()) {
-	 * Point p = it.next();
-	 * if ((p.y > ty
-	 * && ((Math.abs(tx - GraphFacilities.W / 2)
-	 * > Math.abs(p.x - GraphFacilities.W / 2))
-	 * || (Math.abs(tx - GraphFacilities.W / 2)
-	 * == 0)))) {
-	 * Move(p.y, p.x);
-	 * cpuSoldiers[findCpuPlayerIndex(
-	 * new Point(tx, ty))].setLocation(p);
-	 * return;
-	 * }
-	 * }
-	 * it = points.iterator();
-	 * while (it.hasNext()) {
-	 * Point p = it.next();
-	 * if ((p.y == ty
-	 * && Math.abs(tx - GraphFacilities.W / 2)
-	 * > Math.abs(p.x - GraphFacilities.W / 2))) {
-	 * Move(p.y, p.x);
-	 * cpuSoldiers[findCpuPlayerIndex(
-	 * new Point(tx, ty))].setLocation(p);
-	 * return;
-	 * }
-	 * }
-	 * it = points.iterator();
-	 * while (it.hasNext()) {
-	 * Point p = it.next();
-	 * if (p.y > ty) {
-	 * Move(p.y, p.x);
-	 * cpuSoldiers[findCpuPlayerIndex(
-	 * new Point(tx, ty))].setLocation(p);
-	 * return;
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * 
-	 * private int countOutsideSoldiers() {
-	 * int counter = 10;
-	 * for (int i = 13; i < GraphFacilities.H; i++) {
-	 * for (int j = 9 + (i - 13); j < 16 - (i - 13); j += 2) {
-	 * if (GraphFacilities.vertexMat[i][j].content
-	 * == PlayerEnum.CPU_PLAYER) {
-	 * counter--;
-	 * }
-	 * }
-	 * }
-	 * return counter;
-	 * }
-	 * 
-	 * private CCEdge findFarthestJump() {
-	 * CCEdge jump = null;
-	 * for (int i = 0; i < GraphFacilities.vertexMat.length; i++) {
-	 * for (int j = 0; j < GraphFacilities.vertexMat[i].length; j++) {
-	 * if (GraphFacilities.vertexMat[i][j] != null
-	 * && GraphFacilities.vertexMat[i][j].content
-	 * == PlayerEnum.CPU_PLAYER) {
-	 * resetBoard();
-	 * optinalPlaysLen3(j, i);
-	 * for (int h = i; h < GraphFacilities.vertexMat.length; h++) {
-	 * for (int g = 0; g < GraphFacilities.vertexMat[h].length; g++) {
-	 * if (GraphFacilities.vertexMat[h][g] != null
-	 * && GraphFacilities.vertexMat[h][g].content
-	 * == PlayerEnum.POSSIBLE_CPU_TARGET) {
-	 * if (jump != null) {
-	 * if ((jump.getDestVertx().getLocation().y < h)
-	 * || (jump.getDestVertx().getLocation().y == h
-	 * && Math.abs(
-	 * jump.getDestVertx().getLocation().x
-	 * - (GraphFacilities.W / 2))
-	 * > Math.abs(g - (GraphFacilities.W / 2)))) {
-	 * if ((i < h)
-	 * || (i == h
-	 * && Math.abs(j - (GraphFacilities.W / 2))
-	 * > Math.abs(
-	 * g - (GraphFacilities.W / 2)))) {
-	 * jump.setSrcVertx(
-	 * GraphFacilities.vertexMat[i][j]);
-	 * jump.setDestVertx(
-	 * GraphFacilities.vertexMat[h][g]);
-	 * }
-	 * }
-	 * } else {
-	 * if ((i < h)
-	 * || (i == h
-	 * && Math.abs(j - (GraphFacilities.W / 2))
-	 * > Math.abs(g - (GraphFacilities.W / 2)))) {
-	 * jump = new CCEdge(GraphFacilities.vertexMat[i][j],
-	 * GraphFacilities.vertexMat[h][g]);
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * }
-	 * return jump;
-	 * }
-	 * 
-	 * private Point is_S_TurnExist() {
-	 * for (int i = GraphFacilities.vertexMat.length - 1; i >= 0; i--) {
-	 * for (int j = GraphFacilities.vertexMat[i].length - 1; j >= 0; j--) {
-	 * if (GraphFacilities.vertexMat[i][j] != null
-	 * && GraphFacilities.vertexMat[i][j].content
-	 * == PlayerEnum.CPU_PLAYER) {
-	 * resetBoard();
-	 * optinalPlays(j, i);
-	 * if (i + 4 < GraphFacilities.vertexMat.length
-	 * && GraphFacilities.vertexMat[i + 4][j] != null
-	 * && j - 1 > 0 && j + 1 < GraphFacilities.vertexMat[i].length
-	 * && GraphFacilities.vertexMat[i + 2][j].content
-	 * == PlayerEnum.CPU_PLAYER
-	 * && GraphFacilities.vertexMat[i + 4][j].content
-	 * == PlayerEnum.POSSIBLE_CPU_TARGET
-	 * && ((GraphFacilities.vertexMat[i + 1][j + 1].content
-	 * == PlayerEnum.CPU_PLAYER
-	 * && GraphFacilities.vertexMat[i + 3][j + 1].content
-	 * == PlayerEnum.CPU_PLAYER
-	 * && GraphFacilities.vertexMat[i + 2][j + 2].content
-	 * == PlayerEnum.POSSIBLE_CPU_TARGET)
-	 * || (GraphFacilities.vertexMat[i + 1][j - 1].content
-	 * == PlayerEnum.CPU_PLAYER
-	 * && GraphFacilities.vertexMat[i + 3][j - 1].content
-	 * == PlayerEnum.CPU_PLAYER
-	 * && GraphFacilities.vertexMat[i + 2][j - 2].content
-	 * == PlayerEnum.POSSIBLE_CPU_TARGET))) {
-	 * return new Point(j, i);
-	 * }
-	 * }
-	 * }
-	 * }
-	 * return null;
-	 * }
-	 * 
-	 * private int findCpuPlayerIndex(Point p) {
-	 * if (p != null) {
-	 * for (int i = 0; i < cpuSoldiers.length; i++) {
-	 * if (cpuSoldiers[i].equals(p)) {
-	 * return i;
-	 * }
-	 * }
-	 * }
-	 * return -1;
-	 * }
-	 */
 }
